@@ -24,11 +24,14 @@ public:
 	
 	void addBackGround();   // 添加背景
 	void addBoard();   // 添加板
-	void addListener(); // 添加键盘监听器
-	void addball();    //添加球
+    void addball();    //添加球
 
-	void update(float dt);
+	void addKeyListener(); // 添加键盘监听器
+	void onKeyPressed(EventKeyboard::KeyCode code, Event* event);      //用于ball蓄力判断
+	void onKeyReleased(EventKeyboard::KeyCode code, Event* event);     //
 
+	void update(float dt);     //用于处理board移动 和小球蓄力
+    
 
     void setJoint();
 
@@ -37,11 +40,14 @@ public:
 	int speed = 2;                 //board speed
 	int tagboard = 0;
 	int tagball = 1;
+
+	int ifstart = 0;              //是否已经开始蓄力   0=未蓄力
+	int startF;                   //赋予小球的动量
+
 	//void updateShip(float dt);  // 更新船的平衡情况
 	//void BrickGeneraetd();  // 掉落箱子
 
-	//void onKeyPressed(EventKeyboard::KeyCode code, Event* event);
-	//void onKeyReleased(EventKeyboard::KeyCode code, Event* event);
+	
 	//bool onConcactBegin(PhysicsContact& contact);
 
 	//void preloadMusic();                   // 预加载音乐

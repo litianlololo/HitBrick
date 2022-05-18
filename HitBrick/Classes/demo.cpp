@@ -49,19 +49,21 @@ bool HitBrick::init()
     //添加背景
     //addBackGround();
     label = Label::create();
+    label->setString("awd");
     label->setPosition(Vec2(origin.x + visibleSize.width / 2,
        300));
     this->addChild(label,5);
     
+    ifstart = 0;   //未发球
+    startF = 0;    //
     
+
     //添加板
-
-
     addBoard();
     //添加球
     addball();
     //添加键盘监听器
-    addListener();
+    addKeyListener();
 
     scheduleUpdate();
 
@@ -138,21 +140,22 @@ void HitBrick::addball()
     addChild(ball, tagball);
 }
 
-void HitBrick::addListener()
+//键盘监视器
+void HitBrick::addKeyListener()  
 {
     auto keyboardListener = EventListenerKeyboard::create();
+    keyboardListener->onKeyPressed = CC_CALLBACK_2(HitBrick::onKeyPressed, this);
+    keyboardListener->onKeyReleased = CC_CALLBACK_2(HitBrick::onKeyReleased, this);
+     _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener, this);
+    scheduleUpdate();
+    /*
     keyboardListener->onKeyPressed = [=](EventKeyboard::KeyCode keycode, Event* event) {
         CCLOG("pressed");
-        keyMap[keycode] = true;
     };
     keyboardListener->onKeyReleased = [=](EventKeyboard::KeyCode keycode, Event* event) {
         CCLOG("released");
-        keyMap[keycode] = false;
     };
-
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener, this);
-    scheduleUpdate();
-
+    */
     return;
 }
 
@@ -164,6 +167,7 @@ void HitBrick::update(float delta) {
     auto d = EventKeyboard::KeyCode::KEY_D;
     int offsetx = 0;
     int offsety = 0;
+
     //限定board移动范围
     bool ifw = 1;            //能否wasd移动
     bool ifs = 1;
@@ -175,18 +179,28 @@ void HitBrick::update(float delta) {
 
     x = sprite->getPositionX();
     y = sprite->getPositionY();
-    std::string str = StringUtils::format("%d  %d", x, y);
-    label->setString(str);
+    
+    int bottom = 5;
+    int over = 100;
+    int right = 385;
+    int left = 95;
 
-    if (y <= 10)
+    if (y <= bottom) {
+        board->setPositionY(bottom);
         ifs = 0;
-    if (y >= 100)
+    }
+    if (y >= over) {
+        board->setPositionY(over);
         ifw = 0;
-    if (x <= 100)
+    }
+    if (x <= left) {
+        board->setPositionX(left);
         ifa = 0;
-    if (x >= 380)
+    }
+    if (x >= right) {
+        board->setPositionX(right);
         ifd = 0;
-
+    }
     if (keyMap[a] && ifa)
     {
         offsetx = -1 * speed;
@@ -204,14 +218,47 @@ void HitBrick::update(float delta) {
         offsety = -1 * speed;
     }
 
-    if (offsetx == 0 && offsety == 0)
-        return;
+    if (offsetx == 0 && offsety == 0 && !keyMap[EventKeyboard::KeyCode::KEY_SPACE])
+       return;
     auto moveto = MoveTo::create(0.2f, Vec2(sprite->getPositionX() + offsetx, sprite->getPositionY() + offsety));
-    sprite->runAction(moveto);
+    if(ifstart!=0)        //初始board不能移动
+        sprite->runAction(moveto);
+
+    //SPACE  ball蓄力
+    if (ifstart==1 && startF<=200) {
+        startF++;
+        std::string str = StringUtils::format("%d", startF);
+        label->setString(str);
+    }
 
     return;
 }
 
+
+void HitBrick::onKeyPressed(EventKeyboard::KeyCode keycode, Event* event)                 
+{
+    //键盘按下
+    keyMap[keycode] = true;
+    //第一次按空格开始蓄力
+    if (EventKeyboard::KeyCode::KEY_SPACE == keycode && ifstart==0) {                      
+        ifstart = 1;    //在update函数中蓄力
+    }
+}
+
+void HitBrick::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
+{
+    //键盘释放
+    keyMap[keycode] = false;   
+
+    //空格release 停止蓄力释放小球
+    if (EventKeyboard::KeyCode::KEY_SPACE == keycode) {
+        if (ifstart == 1) {
+            ifstart = -1;          //小球不再蓄力
+            ball->getPhysicsBody()->setVelocity(Vec2(0, startF*2));
+        }
+    }
+    return;
+}
 void HitBrick::setPhysicsWorld(PhysicsWorld* world)
 {
     HitBrick_world = world; 
