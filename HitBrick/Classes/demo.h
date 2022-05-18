@@ -17,7 +17,7 @@ public:
 
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> keyMap;
 
-	
+	Label* label;
 
 	static PhysicsWorld* world;
 	void setPhysicsWorld(PhysicsWorld* world);      //带物理引擎的场景
@@ -34,7 +34,7 @@ public:
 
 	Sprite* ball;
 	Sprite* board;
-
+	int speed = 2;                 //board speed
 	int tagboard = 0;
 	int tagball = 1;
 	//void updateShip(float dt);  // 更新船的平衡情况

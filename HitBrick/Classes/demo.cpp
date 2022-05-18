@@ -34,9 +34,9 @@ bool HitBrick::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     //添加地图
-    map->setAnchorPoint(Vec2(0.5f, 0.5f));                                                
-    map->setPosition((Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y)));
-    this->addChild(map, 2);
+    map->setAnchorPoint(Vec2(0.5f, 0));                                                
+    map->setPosition((Vec2(visibleSize.width / 2 + origin.x,0)));
+    this->addChild(map, -1);
     /*
     std::string str = StringUtils::format("%ld",visibleSize.width / 2);
     auto label = Label::create();
@@ -48,7 +48,15 @@ bool HitBrick::init()
 
     //添加背景
     //addBackGround();
+    label = Label::create();
+    label->setPosition(Vec2(origin.x + visibleSize.width / 2,
+       300));
+    this->addChild(label,5);
+    
+    
     //添加板
+
+
     addBoard();
     //添加球
     addball();
@@ -80,7 +88,8 @@ void HitBrick::addBackGround()
 void HitBrick::addBoard()
 {
     board = Sprite::create("board/board.png");
-    board->setPosition(Vec2(visibleSize.width + origin.x, origin.y + 50));
+    board->setAnchorPoint(Vec2(0.5f, 0.5f));
+    board->setPosition(Vec2(visibleSize.width/2 + origin.x, origin.y + 50));
 
     board->setTag(0);           //供键盘监听器定位
 
@@ -110,7 +119,7 @@ void HitBrick::addball()
 {
     ball = Sprite::create("ball/ball.png");
     ball->setScale(2.0f,2.0f);
-    ball->setPosition(Vec2(visibleSize.width + origin.x, origin.y + 50 + board->getContentSize().height));
+    ball->setPosition(Vec2(visibleSize.width/2 + origin.x, origin.y + 50 + board->getContentSize().height));
 
     // 设置球的刚体属性
     auto ballBody = PhysicsBody::createCircle(ball->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
@@ -155,23 +164,46 @@ void HitBrick::update(float delta) {
     auto d = EventKeyboard::KeyCode::KEY_D;
     int offsetx = 0;
     int offsety = 0;
-    int speed = 2;
-    if (keyMap[a])
+    //限定board移动范围
+    bool ifw = 1;            //能否wasd移动
+    bool ifs = 1;
+    bool ifa = 1;
+    bool ifd = 1;
+
+    int x = 0;
+    int y = 0;
+
+    x = sprite->getPositionX();
+    y = sprite->getPositionY();
+    std::string str = StringUtils::format("%d  %d", x, y);
+    label->setString(str);
+
+    if (y <= 10)
+        ifs = 0;
+    if (y >= 100)
+        ifw = 0;
+    if (x <= 100)
+        ifa = 0;
+    if (x >= 380)
+        ifd = 0;
+
+    if (keyMap[a] && ifa)
     {
         offsetx = -1 * speed;
     }
-    if (keyMap[d])
+    if (keyMap[d] && ifd)
     {
         offsetx = speed;
     }
-    if (keyMap[w])
+    if (keyMap[w] && ifw)
     {
         offsety = speed;
     }
-    if (keyMap[s])
+    if (keyMap[s] && ifs)
     {
         offsety = -1 * speed;
     }
+
     if (offsetx == 0 && offsety == 0)
         return;
     auto moveto = MoveTo::create(0.2f, Vec2(sprite->getPositionX() + offsetx, sprite->getPositionY() + offsety));
