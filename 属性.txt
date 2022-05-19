@@ -1,3 +1,7 @@
 窗口分辨率 1024 768
 
 地图大小 12*64,12*50     768*600
+
+边界范围   bottom = 0 over = 282  right = 453   left = 95
+
+地图居中 visibleSize.width / 2 + origin.x+28,145

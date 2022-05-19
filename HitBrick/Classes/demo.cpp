@@ -62,6 +62,8 @@ bool HitBrick::init()
     addBoard();
     //添加球
     addball();
+    //添加Wall
+    addWall();
     //添加键盘监听器
     addKeyListener();
 
@@ -140,6 +142,25 @@ void HitBrick::addball()
     addChild(ball, tagball);
 }
 
+void HitBrick::addWall()
+{
+    //边界
+    int bottom = 0;
+    int over = 282;
+    int right = 453;
+    int left = 95;
+    //边界Size
+    Size WallSize = Size(right-left,over-bottom);   
+    
+    auto WallBody = PhysicsBody::createEdgeBox(WallSize, PhysicsMaterial(0.0f, 1.0f, 0.0f),3);  //Wall的刚体属性  无密度 完全弹性碰撞 无摩擦力  第三个参数是边框的宽度
+
+    Wall = Sprite::create();
+    Wall->setAnchorPoint(Vec2(0.5,0));
+    Wall->setPosition(visibleSize.width / 2 + origin.x+28,145);
+    Wall->setPhysicsBody(WallBody);
+    addChild(Wall);
+
+}
 //键盘监视器
 void HitBrick::addKeyListener()  
 {
@@ -227,7 +248,7 @@ void HitBrick::update(float delta) {
     //SPACE  ball蓄力
     if (ifstart==1 && startF<=200) {
         startF++;
-        std::string str = StringUtils::format("%d", startF);
+        std::string str = StringUtils::format("%d %d %d", startF,x,y);
         label->setString(str);
     }
 
