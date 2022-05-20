@@ -27,6 +27,7 @@ public:
     void addball();    //添加球
 	void addWall();    //添加边界
 	void addKeyListener(); // 添加键盘监听器
+	void addBricks();
 	void onKeyPressed(EventKeyboard::KeyCode code, Event* event);      //用于ball蓄力判断
 	void onKeyReleased(EventKeyboard::KeyCode code, Event* event);     //
 
@@ -38,7 +39,7 @@ public:
 	Sprite* board;
 	Sprite* Wall;                  //边界，ball碰到会反弹
 	 
-	int speed = 2;                 //board speed
+	int speed = 4;                 //board speed
 	int tagboard = 0;
 	int tagball = 1;
 

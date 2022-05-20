@@ -242,7 +242,7 @@ void HitBrick::update(float delta) {
     if (offsetx == 0 && offsety == 0 && !keyMap[EventKeyboard::KeyCode::KEY_SPACE])
        return;
     auto moveto = MoveTo::create(0.2f, Vec2(sprite->getPositionX() + offsetx, sprite->getPositionY() + offsety));
-    if(ifstart!=0)        //初始board不能移动
+    if(ifstart==-1)        //初始board不能移动
         sprite->runAction(moveto);
 
     //SPACE  ball蓄力
@@ -255,6 +255,12 @@ void HitBrick::update(float delta) {
     return;
 }
 
+void HitBrick::addBricks()
+{
+    TMXObjectGroup* duixiangc = map->getObjectGroups("object");
+
+
+}
 
 void HitBrick::onKeyPressed(EventKeyboard::KeyCode keycode, Event* event)                 
 {
