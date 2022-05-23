@@ -16,8 +16,9 @@ Scene* HitBrick::createScene() {
 
     scene->getPhysicsWorld()->setGravity(Vec2(0, -300.0f));
     auto layer = HitBrick::create();
+    
     layer->setPhysicsWorld(scene->getPhysicsWorld());
-    //layer->setJoint();
+    layer->setJoint();
     scene->addChild(layer);
     return scene;
 }
@@ -34,7 +35,7 @@ bool HitBrick::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     //添加地图
-    map->setAnchorPoint(Vec2(0.5f, 0));                                                
+    map->setAnchorPoint(Vec2(0.5f, 0));
     map->setPosition((Vec2(visibleSize.width / 2 + origin.x,0)));
     this->addChild(map, -1);
     /*
@@ -62,10 +63,16 @@ bool HitBrick::init()
     addBoard();
     //添加球
     addball();
+    //绑定ball和board
+ 
     //添加Wall
     addWall();
+    //添加砖块
+    addBricks();
     //添加键盘监听器
     addKeyListener();
+    //添加碰撞监听器
+    addcontactListener();
 
     scheduleUpdate();
 
@@ -95,15 +102,15 @@ void HitBrick::addBoard()
     board->setAnchorPoint(Vec2(0.5f, 0.5f));
     board->setPosition(Vec2(visibleSize.width/2 + origin.x, origin.y + 50));
 
-    board->setTag(0);           //供键盘监听器定位
+    board->setTag(tagboard);           //供键盘监听器定位
 
     
     //添加板的刚体属性
     auto BoardBody = PhysicsBody::createBox(board->getContentSize(), PhysicsMaterial(1000.0f, 1.0f, 10.0f));
   
     BoardBody->setCategoryBitmask(0xFFFFFFFF);           //类别掩码
-    BoardBody->setCollisionBitmask(0xFFFFFFFF);           //允许撞我
-    BoardBody->setContactTestBitmask(0xFFFFFFFF);        //可接到通知
+    BoardBody->setCollisionBitmask(0xFFFFFFFF);           //允许撞我  碰撞掩码
+    BoardBody->setContactTestBitmask(0xFFFFFFFF);        //可接到通知  接触掩码
     BoardBody->setGravityEnable(false);                  //不受重力影响
     BoardBody->setTag(tagboard);
     //只有己方的CategoryBitmask，与对方的CollisionBitmask与运算不为0
@@ -133,13 +140,13 @@ void HitBrick::addball()
     ballBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
     ballBody->setGravityEnable(false);                    //不受重力影响
     
-    ballBody->setTag(tagball);
+    //ballBody->setTag(tagball);
     
     ballBody->setRotationEnable(false);                  //设定球不旋转
 
     ball->setPhysicsBody(ballBody);                
-
-    addChild(ball, tagball);
+    ball->setTag(tagball);
+    addChild(ball);
 }
 
 void HitBrick::addWall()
@@ -180,8 +187,20 @@ void HitBrick::addKeyListener()
     return;
 }
 
+//砖块碰撞监测器
+void HitBrick::addcontactListener()
+{
+    EventListenerPhysicsContact* contactListener= EventListenerPhysicsContact::create();
+    contactListener->onContactBegin = CC_CALLBACK_1(HitBrick::onConcactBegin, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
+    scheduleUpdate();
+    return;
+}
+
+
 void HitBrick::update(float delta) {
-    Node* sprite = this->getChildByTag(0);
+    Node* board = this->getChildByTag(tagboard);
+    //Node* ball  = this->getChildByTag(tagball);                    ???为什么ball 和 board 同时动会报错？？？
     auto w = EventKeyboard::KeyCode::KEY_W;
     auto s = EventKeyboard::KeyCode::KEY_S;
     auto a = EventKeyboard::KeyCode::KEY_A;
@@ -198,8 +217,8 @@ void HitBrick::update(float delta) {
     int x = 0;
     int y = 0;
 
-    x = sprite->getPositionX();
-    y = sprite->getPositionY();
+    x =board->getPositionX();
+    y = board->getPositionY();
     
     int bottom = 5;
     int over = 100;
@@ -241,12 +260,11 @@ void HitBrick::update(float delta) {
 
     if (offsetx == 0 && offsety == 0 && !keyMap[EventKeyboard::KeyCode::KEY_SPACE])
        return;
-    auto moveto = MoveTo::create(0.2f, Vec2(sprite->getPositionX() + offsetx, sprite->getPositionY() + offsety));
-    if(ifstart==-1)        //初始board不能移动
-        sprite->runAction(moveto);
+    auto movebyboard = MoveBy::create(0.2f, Vec2(offsetx,offsety));                  
+    board->runAction(movebyboard);
 
     //SPACE  ball蓄力
-    if (ifstart==1 && startF<=200) {
+    if (ifstart==1 && startF<=100) {
         startF++;
         std::string str = StringUtils::format("%d %d %d", startF,x,y);
         label->setString(str);
@@ -257,9 +275,42 @@ void HitBrick::update(float delta) {
 
 void HitBrick::addBricks()
 {
-    TMXObjectGroup* duixiangc = map->getObjectGroups("object");
+    TMXObjectGroup* objectGroup = map->getObjectGroup("bricks");
+    ValueVector values = objectGroup->getObjects();
+    
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+       float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+         //name/type/width/height
+        //int hp = valueMap["hp"].asInt();
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("bluebrick.png"); //enemy = type == 4 ? Sprite::create("CloseNormal.png") : Sprite::create("CloseSelected.png");//根据位置属性创建精灵
+        it->setAnchorPoint(Vec2(0,0));                       
+        it->setPosition(60+x,y);
 
 
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+        //BrickBody->setTag(tagbrick);
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+        this->addChild(it); 
+        it->setTag(tagbrick);
+
+        bricksnum++;
+        Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
+    }
 }
 
 void HitBrick::onKeyPressed(EventKeyboard::KeyCode keycode, Event* event)                 
@@ -281,21 +332,103 @@ void HitBrick::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
     if (EventKeyboard::KeyCode::KEY_SPACE == keycode) {
         if (ifstart == 1) {
             ifstart = -1;          //小球不再蓄力
-            ball->getPhysicsBody()->setVelocity(Vec2(0, startF*2));
+            HitBrick_world->removeJoint(joint);
+            ball->getPhysicsBody()->setVelocity(Vec2(0, startF*4));
         }
     }
     return;
 }
+
 void HitBrick::setPhysicsWorld(PhysicsWorld* world)
 {
     HitBrick_world = world; 
     return;
 }
 
+
+bool HitBrick::onConcactBegin(PhysicsContact& contact) {
+    auto nodeA = contact.getShapeA()->getBody()->getNode();
+    auto nodeB = contact.getShapeB()->getBody()->getNode();
+    
+    if (nodeA->getTag() == tagbrick && nodeB->getTag() == tagball) {
+        removeChild(nodeA);
+        bricksnum--;
+    }
+    else if (nodeB->getTag() == tagbrick && nodeA->getTag() == tagball) {
+        removeChild(nodeB);
+        bricksnum--;
+    }
+
+    if (bricksnum == 0)
+    {
+        Gameover();
+    }
+
+    return true;
+}
+
 /*
-void HitBrick::setJoint() {
-    Vec2 fixPoint = Vec2(ball->getAnchorPoint().x, ball->getAnchorPoint().y - 30);
-    joint1 = PhysicsJointPin::construct(ball->getPhysicsBody(), player->getPhysicsBody(), fixPoint, player->getAnchorPoint());
-    m_world->addJoint(joint1);
+bool HitBrick::TouchBegan(cocos2d::Touch* pTouch, Event* pEvent)
+{
+    point = this->tilePosFromLocation(pTouch->getLocation(), (TMXTiledMap*)this->getChildByTag(1));
+    return true;
+}
+
+Point HitBrick::tilePosFromLocation(Point location, TMXTiledMap* tileMap)
+{
+    //pos是地图上的坐标，当前屏幕的坐标+地图的偏移量
+    Point pos =Vec2(location, tileMap->getPosition());
+    pos.x = (int)(pos.x / tileMap->getTileSize().width);
+    //（地图总块数*每块的像素 - 现在的y坐标）/ 每块的像素
+    //getMapSize().height是地图高度的瓷砖数
+    pos.y = (int)(((tileMap->getMapSize().height * tileMap->getTileSize().height - pos.y)) / tileMap->getTileSize().height);
+    return pos;
 }
 */
+void HitBrick::setJoint() 
+{
+    joint = PhysicsJointFixed::construct(ball->getPhysicsBody(), board->getPhysicsBody(),board->getAnchorPoint());
+    HitBrick_world->addJoint(joint);
+}
+
+void HitBrick::Gameover() {
+
+    _eventDispatcher->removeAllEventListeners();
+    ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
+    board->getPhysicsBody()->setVelocity(Vec2(0, 0));
+    if (bricksnum==0) {
+        auto label1 = Label::createWithTTF("Success!~", "fonts/Marker Felt.ttf", 60);
+        label1->setColor(Color3B(0, 0, 0));
+        label1->setPosition(visibleSize.width / 2+ origin.x, visibleSize.height / 2);
+        this->addChild(label1,1);
+    }
+
+    /*
+    auto label2 = Label::createWithTTF("重玩", "fonts/Marker Felt.ttf", 40);
+    label2->setColor(Color3B(0, 0, 0));
+    auto replayBtn = MenuItemLabel::create(label2, CC_CALLBACK_1(HitBrick::replayCallback, this));
+    Menu* replay = Menu::create(replayBtn, NULL);
+    replay->setPosition(visibleSize.width / 2 - 80, visibleSize.height / 2 - 100);
+    this->addChild(replay);
+
+    auto label3 = Label::createWithTTF("退出", "fonts/Marker Felt.ttf", 40);
+    label3->setColor(Color3B(0, 0, 0));
+    auto exitBtn = MenuItemLabel::create(label3, CC_CALLBACK_1(HitBrick::exitCallback, this));
+    Menu* exit = Menu::create(exitBtn, NULL);
+    exit->setPosition(visibleSize.width / 2 + 90, visibleSize.height / 2 - 100);
+    this->addChild(exit);
+    */
+}
+
+// 继续或重玩按钮响应函数
+void HitBrick::replayCallback(Ref* pSender) {
+    Director::getInstance()->replaceScene(HitBrick::createScene());
+}
+
+// 退出
+void HitBrick::exitCallback(Ref* pSender) {
+    Director::getInstance()->end();
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    exit(0);
+#endif
+}
