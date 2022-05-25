@@ -9,10 +9,10 @@ USING_NS_CC;
 class HitBrick : public cocos2d::Layer {
 public:
 
-	cocos2d::TMXTiledMap* map = cocos2d::TMXTiledMap::create("map.tmx");
+	cocos2d::TMXTiledMap* map;
 	
 	virtual bool init();
-
+	static Scene* scene();
 	static cocos2d::Scene* createScene();
 
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> keyMap;
@@ -26,11 +26,13 @@ public:
 	void addBoard();   // 添加板
     void addball();    //添加球
 	void addWall();    //添加边界
+	void addmap();     //添加地图
 	void addBricks();  //从地图中添加砖块
 
 	void addKeyListener(); // 添加键盘监听器
 	void addcontactListener(); //添加碰撞监听器
 
+	void addbutton();
 
 	void onKeyPressed(EventKeyboard::KeyCode code, Event* event);      //用于ball蓄力判断
 	void onKeyReleased(EventKeyboard::KeyCode code, Event* event);     //
@@ -39,8 +41,10 @@ public:
 
 	void Gameover();
 	void replayCallback(Ref* pSender);
+	void pauseClickCallBack(Ref* pSender);
 	void exitCallback(Ref* pSender);
 
+	void backGamemenu(float dt);
 
 	void setJoint();    //添加ball和board之间的关节joint，未蓄力前可一起移动
 	PhysicsJointFixed* joint;
@@ -54,8 +58,8 @@ public:
 	int tagboard = 0;
 	int tagball = 1;
 	int tagbrick = 2;
-	
-
+	int Gamechoice = 0;
+	int score=0;
 	int ifstart = 0;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
 	int startF;                   //赋予小球的动量
 	int bricksnum = 0;            //剩余砖块数

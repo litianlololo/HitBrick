@@ -25,6 +25,9 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 #include "demo.h"
+#include "Mainmenu.h"
+#include "Gamemenu.h"
+#include "store.h"
 // #define USE_AUDIO_ENGINE 1
 
 #if USE_AUDIO_ENGINE
@@ -108,7 +111,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
-    auto scene = HitBrick::createScene();
+    auto scene = Mainmenu::createScene();
 
     // run
     director->runWithScene(scene);

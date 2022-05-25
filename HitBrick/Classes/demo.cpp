@@ -1,7 +1,8 @@
 #include "cocos2d.h"
 #include "demo.h"
-
-
+#include "store.h"
+#include "Gamemenu.h"
+//#include "Gamemenu.cpp"
 
 USING_NS_CC;
 
@@ -30,14 +31,11 @@ bool HitBrick::init()
     {
         return false;
     }
-
+    UserDefault::getInstance()->flush();
     visibleSize = Director::getInstance()->getVisibleSize();                              //获取屏幕坐标
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    //添加地图
-    map->setAnchorPoint(Vec2(0.5f, 0));
-    map->setPosition((Vec2(visibleSize.width / 2 + origin.x,0)));
-    this->addChild(map, -1);
+    
     /*
     std::string str = StringUtils::format("%ld",visibleSize.width / 2);
     auto label = Label::create();
@@ -50,7 +48,7 @@ bool HitBrick::init()
     //添加背景
     //addBackGround();
     label = Label::create();
-    label->setString("awd");
+    label->setString(" ");
     label->setPosition(Vec2(origin.x + visibleSize.width / 2,
        300));
     this->addChild(label,5);
@@ -58,17 +56,19 @@ bool HitBrick::init()
     ifstart = 0;   //未发球
     startF = 0;    //
     
-
+    //添加地图
+    addmap();
     //添加板
     addBoard();
     //添加球
     addball();
-    //绑定ball和board
- 
     //添加Wall
     addWall();
     //添加砖块
     addBricks();
+    //添加暂停按钮
+    addbutton();
+
     //添加键盘监听器
     addKeyListener();
     //添加碰撞监听器
@@ -149,6 +149,28 @@ void HitBrick::addball()
     addChild(ball);
 }
 
+void HitBrick::addmap()
+{
+    //选择地图  
+    UserDefault::getInstance()->flush();
+    Gamechoice = UserDefault::getInstance()->getIntegerForKey("Gamechoice",0);
+    switch (Gamechoice) {
+    case 1:
+        map = cocos2d::TMXTiledMap::create("map.tmx");
+        break;
+    case 2:
+        map = cocos2d::TMXTiledMap::create("map2.tmx");
+        break;
+    default:
+        map = cocos2d::TMXTiledMap::create("map3.tmx");
+        break;
+    }
+    map->setAnchorPoint(Vec2(0.5f, 0));
+    map->setPosition((Vec2(visibleSize.width / 2 + origin.x + 28, 0)));
+    this->addChild(map, -1);
+
+}
+
 void HitBrick::addWall()
 {
     //边界
@@ -187,6 +209,16 @@ void HitBrick::addKeyListener()
     return;
 }
 
+void HitBrick::addbutton() {
+    auto pause = MenuItemImage::create("progress/pause.png","progress/pause.png",CC_CALLBACK_1(HitBrick::pauseClickCallBack, this));
+    auto menu = Menu::create(pause, NULL);
+    menu->setPosition(Vec2(visibleSize.width-30, visibleSize.height-20));
+    addChild(menu);
+}
+void HitBrick::pauseClickCallBack(Ref* pSender)
+{
+
+}
 //砖块碰撞监测器
 void HitBrick::addcontactListener()
 {
@@ -353,17 +385,19 @@ bool HitBrick::onConcactBegin(PhysicsContact& contact) {
     if (nodeA->getTag() == tagbrick && nodeB->getTag() == tagball) {
         removeChild(nodeA);
         bricksnum--;
+        score++;
     }
     else if (nodeB->getTag() == tagbrick && nodeA->getTag() == tagball) {
         removeChild(nodeB);
         bricksnum--;
+        score++;
     }
 
     if (bricksnum == 0)
     {
         Gameover();
     }
-
+   
     return true;
 }
 
@@ -391,33 +425,27 @@ void HitBrick::setJoint()
     HitBrick_world->addJoint(joint);
 }
 
-void HitBrick::Gameover() {
-
+void HitBrick::Gameover() 
+{
+    //停用所有监控器
     _eventDispatcher->removeAllEventListeners();
     ball->getPhysicsBody()->setVelocity(Vec2(0, 0));
     board->getPhysicsBody()->setVelocity(Vec2(0, 0));
     if (bricksnum==0) {
+        //输出success
         auto label1 = Label::createWithTTF("Success!~", "fonts/Marker Felt.ttf", 60);
         label1->setColor(Color3B(0, 0, 0));
-        label1->setPosition(visibleSize.width / 2+ origin.x, visibleSize.height / 2);
+        label1->setPosition(visibleSize.width / 2+ origin.x+28, visibleSize.height / 2);
         this->addChild(label1,1);
+
+        //延时两秒返回Gamemenu
+        schedule(SEL_SCHEDULE(&HitBrick::backGamemenu), 2.0f);
     }
+}
 
-    /*
-    auto label2 = Label::createWithTTF("重玩", "fonts/Marker Felt.ttf", 40);
-    label2->setColor(Color3B(0, 0, 0));
-    auto replayBtn = MenuItemLabel::create(label2, CC_CALLBACK_1(HitBrick::replayCallback, this));
-    Menu* replay = Menu::create(replayBtn, NULL);
-    replay->setPosition(visibleSize.width / 2 - 80, visibleSize.height / 2 - 100);
-    this->addChild(replay);
-
-    auto label3 = Label::createWithTTF("退出", "fonts/Marker Felt.ttf", 40);
-    label3->setColor(Color3B(0, 0, 0));
-    auto exitBtn = MenuItemLabel::create(label3, CC_CALLBACK_1(HitBrick::exitCallback, this));
-    Menu* exit = Menu::create(exitBtn, NULL);
-    exit->setPosition(visibleSize.width / 2 + 90, visibleSize.height / 2 - 100);
-    this->addChild(exit);
-    */
+void HitBrick::backGamemenu(float dt) {
+    auto Gamescene = Gamemenu::createScene();
+    Director::getInstance()->replaceScene(Gamescene);
 }
 
 // 继续或重玩按钮响应函数
