@@ -24,7 +24,6 @@ Scene* HitBrick::createScene() {
     return scene;
 }
 
-
 bool HitBrick::init()
 {
     if (!Layer::init())
@@ -35,16 +34,7 @@ bool HitBrick::init()
     visibleSize = Director::getInstance()->getVisibleSize();                              //获取屏幕坐标
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    
     /*
-    std::string str = StringUtils::format("%ld",visibleSize.width / 2);
-    auto label = Label::create();
-    label->setString(str);
-    label->setPosition(Vec2(origin.x + visibleSize.width / 2,
-        origin.y + visibleSize.height - label->getContentSize().height));
-    this->addChild(label, 1);
-    */
-
     //添加背景
     //addBackGround();
     label = Label::create();
@@ -52,7 +42,8 @@ bool HitBrick::init()
     label->setPosition(Vec2(origin.x + visibleSize.width / 2,
        300));
     this->addChild(label,5);
-    
+    */
+
     ifstart = 0;   //未发球
     startF = 0;    //
     
@@ -68,7 +59,10 @@ bool HitBrick::init()
     addBricks();
     //添加暂停按钮
     addbutton();
-
+    //添加分数
+    addscore();
+    //添加最高分
+    addhscore();
     //添加键盘监听器
     addKeyListener();
     //添加碰撞监听器
@@ -161,8 +155,11 @@ void HitBrick::addmap()
     case 2:
         map = cocos2d::TMXTiledMap::create("map2.tmx");
         break;
-    default:
+    case 3:
         map = cocos2d::TMXTiledMap::create("map3.tmx");
+        break;
+    default:
+        //map = cocos2d::TMXTiledMap::create("map3.tmx");
         break;
     }
     map->setAnchorPoint(Vec2(0.5f, 0));
@@ -208,15 +205,115 @@ void HitBrick::addKeyListener()
     */
     return;
 }
-
+//暂停按钮
 void HitBrick::addbutton() {
     auto pause = MenuItemImage::create("progress/pause.png","progress/pause.png",CC_CALLBACK_1(HitBrick::pauseClickCallBack, this));
     auto menu = Menu::create(pause, NULL);
     menu->setPosition(Vec2(visibleSize.width-30, visibleSize.height-20));
     addChild(menu);
 }
-void HitBrick::pauseClickCallBack(Ref* pSender)
+//暂停目录
+void HitBrick::pauseClickCallBack(Ref* pSender)               
 {
+    Director::getInstance()->stopAnimation();
+
+    pausebg = Sprite::create("progress/bg.png");
+    pausebg->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2);
+    addChild(pausebg,10);                                                                                 
+
+    MenuItemFont::setFontSize(20);
+
+    auto ur1 = FileUtils::getInstance()->getStringFromFile("progress/continue.txt");
+    auto con = MenuItemFont::create(ur1, CC_CALLBACK_1(HitBrick::pausemenuClickCallBack, this));
+
+    auto ur2 = FileUtils::getInstance()->getStringFromFile("progress/back.txt");
+    auto back = MenuItemFont::create(ur2, CC_CALLBACK_1(HitBrick::pausemenuClickCallBack, this));
+
+    auto ur3 = FileUtils::getInstance()->getStringFromFile("progress/restart.txt");
+    auto restart = MenuItemFont::create(ur3, CC_CALLBACK_1(HitBrick::pausemenuClickCallBack, this));
+
+    //MainmenuTag
+    con->setTag(1);
+    back->setTag(2);
+    restart->setTag(3);
+    pausemenu = Menu::create(con, back, restart, NULL);
+    pausemenu->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2);
+    addChild(pausemenu,11);
+    pausemenu->alignItemsVertically();
+}
+
+void HitBrick::pausemenuClickCallBack(Ref* sender)
+{
+    Node* node = dynamic_cast<Node*>(sender);
+    int tag = node->getTag();
+
+    if (NULL != node)
+    {
+        auto Gamemenuscene = Gamemenu::createScene();
+        auto Gamescene = HitBrick::createScene();
+        switch (tag)
+        {
+        case 1:             
+            //继续
+            removeChild(pausebg);
+            removeChild(pausemenu);
+            Director::getInstance()->startAnimation();
+            break;
+        case 2:
+            //返回
+            Director::getInstance()->startAnimation();
+            Director::getInstance()->replaceScene(Gamemenuscene);
+            break;
+        case 3:
+            //重玩
+            Director::getInstance()->startAnimation();
+            Director::getInstance()->replaceScene(Gamescene);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void HitBrick::addscore()
+{
+    auto label = Label::createWithTTF("score", "fonts/Marker Felt.ttf", 24);
+    label->setPosition(Vec2(50, visibleSize.height - 20));
+    this->addChild(label);
+
+    strscore = StringUtils::format("%d",score);
+    scorelabel = Label::createWithTTF(strscore, "fonts/Marker Felt.ttf", 24);
+    scorelabel->setPosition(Vec2(150, visibleSize.height - 20));
+    this->addChild(scorelabel);
+
+}
+//添加最高分
+void HitBrick::addhscore()
+{
+    auto url = FileUtils::getInstance()->getStringFromFile("progress/hscore.txt");
+    auto label = Label::create();
+    label->setString(url);
+    label->setPosition(Vec2(200, visibleSize.height - 20));
+    this->addChild(label);
+
+    //取得最高分
+    std::string hstrscore;
+    switch (Gamechoice) {
+    case 1:
+        hstrscore = StringUtils::format("%d", UserDefault::getInstance()->getIntegerForKey("y1hscore", 0));
+        break;
+    case 2:
+        hstrscore = StringUtils::format("%d", UserDefault::getInstance()->getIntegerForKey("y2hscore", 0));
+        break;
+    case 3:
+        hstrscore = StringUtils::format("%d", UserDefault::getInstance()->getIntegerForKey("y3hscore", 0));
+        break;
+    default:
+        break;
+    }
+    auto hscorelabel = Label::createWithTTF(hstrscore, "fonts/Marker Felt.ttf", 24);
+    hscorelabel->setPosition(Vec2(250, visibleSize.height - 20));
+    this->addChild(hscorelabel);
 
 }
 //砖块碰撞监测器
@@ -298,8 +395,6 @@ void HitBrick::update(float delta) {
     //SPACE  ball蓄力
     if (ifstart==1 && startF<=100) {
         startF++;
-        std::string str = StringUtils::format("%d %d %d", startF,x,y);
-        label->setString(str);
     }
 
     return;
@@ -386,11 +481,17 @@ bool HitBrick::onConcactBegin(PhysicsContact& contact) {
         removeChild(nodeA);
         bricksnum--;
         score++;
+        //更新score
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
     }
     else if (nodeB->getTag() == tagbrick && nodeA->getTag() == tagball) {
         removeChild(nodeB);
         bricksnum--;
         score++;
+        //更新score
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
     }
 
     if (bricksnum == 0)
@@ -437,6 +538,21 @@ void HitBrick::Gameover()
         label1->setColor(Color3B(0, 0, 0));
         label1->setPosition(visibleSize.width / 2+ origin.x+28, visibleSize.height / 2);
         this->addChild(label1,1);
+        
+        switch (Gamechoice) {
+        case 1:
+            UserDefault::getInstance()->setIntegerForKey("y1hscore", score);
+            break;
+        case 2:
+            UserDefault::getInstance()->setIntegerForKey("y2hscore", score);
+            break;
+        case 3:
+            UserDefault::getInstance()->setIntegerForKey("y3hscore", score);
+            break;
+        default:
+            break;
+        }
+        UserDefault::getInstance()->flush();
 
         //延时两秒返回Gamemenu
         schedule(SEL_SCHEDULE(&HitBrick::backGamemenu), 2.0f);

@@ -32,6 +32,9 @@ public:
 	void addKeyListener(); // 添加键盘监听器
 	void addcontactListener(); //添加碰撞监听器
 
+	void addscore();     //添加积分
+	void addhscore();    //添加最高分
+
 	void addbutton();
 
 	void onKeyPressed(EventKeyboard::KeyCode code, Event* event);      //用于ball蓄力判断
@@ -45,6 +48,7 @@ public:
 	void exitCallback(Ref* pSender);
 
 	void backGamemenu(float dt);
+	void HitBrick::pausemenuClickCallBack(Ref* sender);
 
 	void setJoint();    //添加ball和board之间的关节joint，未蓄力前可一起移动
 	PhysicsJointFixed* joint;
@@ -52,17 +56,21 @@ public:
 	Sprite* ball;
 	Sprite* board;
 	Sprite* Wall;                  //边界，ball碰到会反弹
+	Sprite* pausebg;               //暂停背景
+	Menu* pausemenu;            //暂停菜单
+	Label* scorelabel;
 
 	//Tag
 	int speed = 6;                 //board speed
 	int tagboard = 0;
 	int tagball = 1;
 	int tagbrick = 2;
-	int Gamechoice = 0;
+	int Gamechoice = 0;           //游戏关卡
 	int score=0;
 	int ifstart = 0;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
 	int startF;                   //赋予小球的动量
 	int bricksnum = 0;            //剩余砖块数
+	std::string strscore;
 
 	std::vector<Vec2> Brickpath;
 	//std::vector<Sprite*> Bricks;
