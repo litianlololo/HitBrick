@@ -1,6 +1,7 @@
 #pragma once
-#ifndef __Gamemodel_H__
-#define __Gamemodel_H__
+#pragma once
+#ifndef __Gamemenu2_H__
+#define __Gamemenu2_H__
 
 #include "cocos2d.h"
 
@@ -8,7 +9,7 @@ USING_NS_CC;
 
 
 
-class Gamemodel :public cocos2d::Layer {
+class Gamemenu2 :public cocos2d::Layer {
 public:
 	static cocos2d::Scene* createScene();
 
@@ -18,16 +19,14 @@ public:
 	//void menuGoToHelloworld(Ref* pSender);
 
 	void update(float delta);
-	void Game1();
-	void Game2();
-
-	int model = 0;
+	void Game();
+	int Gamechoice = 0;
 	Size visibleSize;
 	Vec2 origin;
 
 
-	CREATE_FUNC(Gamemodel);
+	CREATE_FUNC(Gamemenu2);
 
 };
 
-#endif // __Gamemodel_H__#pragma once
+#endif // __Gamemenu2_H__

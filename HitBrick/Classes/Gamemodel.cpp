@@ -1,6 +1,7 @@
 #include "cocos2d.h"
 #include "Gamemodel.h"
 #include "Gamemenu.h"
+#include "Gamemenu2.h"
 #include "Mainmenu.h"
 #include "demo.h"
 #include "store.h"
@@ -28,8 +29,8 @@ bool Gamemodel::init()
     MenuItemFont::setFontSize(20);
     auto ur1 = FileUtils::getInstance()->getStringFromFile("Gamemodel/Gamemodel1.txt");
     auto game1 = MenuItemFont::create(ur1, CC_CALLBACK_1(Gamemodel::menuClickCallBack, this));
-    //auto ur2 = FileUtils::getInstance()->getStringFromFile("Gamemodel/Gamemodel2.txt");
-    auto game2 = MenuItemFont::create("2", CC_CALLBACK_1(Gamemodel::menuClickCallBack, this));
+    auto ur2 = FileUtils::getInstance()->getStringFromFile("Gamemodel/Gamemodel2.txt");
+    auto game2 = MenuItemFont::create(ur2, CC_CALLBACK_1(Gamemodel::menuClickCallBack, this));
     auto back = MenuItemFont::create("BACK", CC_CALLBACK_1(Gamemodel::menuClickCallBack, this));
     //MainmenuTag
     game1->setTag(1);
@@ -74,6 +75,8 @@ void Gamemodel::update(float delta) {
     if (model == 1) {
         Game1();
     }
+    else if (model == 2)
+        Game2();
 }
 
 //改变场景至关卡选择
@@ -81,4 +84,10 @@ void Gamemodel::Game1()
 {
     auto Gamescene = Gamemenu::createScene();
     Director::getInstance()->replaceScene(Gamescene);
+}
+
+void Gamemodel::Game2()
+{
+    auto Gamescene2 = Gamemenu2::createScene();
+    Director::getInstance()->replaceScene(Gamescene2);
 }
