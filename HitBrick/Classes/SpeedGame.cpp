@@ -58,8 +58,14 @@ bool HitBrick2::init()
     addWall();
     //添加砖块
     addBricks();
-    //添加下边界
-  //  addbottomborder();
+    //添加2x砖块
+    add2xbricks();
+    //添加slow砖块
+    addslowbricks();
+    //添加crazy砖块
+    addcrazybricks();
+    //添加固定砖块
+    addstaticbricks();
     //添加暂停按钮
     addbutton();
     //添加分数
@@ -164,8 +170,10 @@ void HitBrick2::addmap()
     case 3:
         map = cocos2d::TMXTiledMap::create("map3.tmx");
         break;
+    case 4:
+        map = cocos2d::TMXTiledMap::create("map4.tmx");
+        break;
     default:
-        //map = cocos2d::TMXTiledMap::create("map3.tmx");
         break;
     }
     map->setAnchorPoint(Vec2(0.5f, 0));
@@ -315,6 +323,9 @@ void HitBrick2::addhscore()
     case 3:
         hstrscore = StringUtils::format("%d", UserDefault::getInstance()->getIntegerForKey("s3hscore", 0));
         break;
+    case 4:
+        hstrscore = StringUtils::format("%d", UserDefault::getInstance()->getIntegerForKey("s4hscore", 0));
+        break;
     default:
         break;
     }
@@ -408,7 +419,22 @@ void HitBrick2::update(float delta) {
 
     //SPACE  ball //取消蓄力
     if (ifstart == 1 && startF <=30 ) {
-        startF=50;
+        //不同关卡小球初始速度不同
+        switch (Gamechoice) {
+        case 1:
+            startF=50;
+            break;
+        case 2:
+            startF = 65;
+            break;
+        case 3:
+            startF = 60;
+            break;
+        case 4:
+            startF = 50;
+            break;
+        }
+      
     }
    
 
@@ -452,6 +478,150 @@ void HitBrick2::addBricks()
 
         bricksnum++;
         Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
+    }
+}
+
+void HitBrick2::add2xbricks() {
+    TMXObjectGroup* objectGroup = map->getObjectGroup("2xbrick");
+    ValueVector values = objectGroup->getObjects();
+
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("brick2x.png"); 
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+
+        addChild(it);
+        it->setTag(tag2xbrick);
+
+        bricksnum++;
+       // Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
+    }
+}
+
+void HitBrick2::addslowbricks() {
+    TMXObjectGroup* objectGroup = map->getObjectGroup("slowbrick");
+    ValueVector values = objectGroup->getObjects();
+
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("orangebrick.png");
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+
+        addChild(it);
+        it->setTag(tagslowbrick);
+
+        bricksnum++;
+        // Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
+    }
+}
+
+void HitBrick2::addcrazybricks() {
+    TMXObjectGroup* objectGroup = map->getObjectGroup("crazybrick");
+    ValueVector values = objectGroup->getObjects();
+
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("crazybrick.png");
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        //BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+        addChild(it);
+        it->setTag(tagcrazybrick);
+    }
+}
+
+void HitBrick2::addstaticbricks() {
+    TMXObjectGroup* objectGroup = map->getObjectGroup("staticbrick");
+    ValueVector values = objectGroup->getObjects();
+
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("staticbrick.png");
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+        addChild(it);
+        it->setTag(tagstaticbrick);
     }
 }
 
@@ -499,7 +669,7 @@ bool HitBrick2::onConcactBegin(PhysicsContact& contact) {
     if (nodeA->getTag() == tagbrick && nodeB->getTag() == tagball) {
         removeChild(nodeA);
         bricksnum--;
-        score++;
+        score+=perscore;
        
         ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
 
@@ -510,7 +680,7 @@ bool HitBrick2::onConcactBegin(PhysicsContact& contact) {
     else if (nodeB->getTag() == tagbrick && nodeA->getTag() == tagball) {
         removeChild(nodeB);
         bricksnum--;
-        score++;
+        score+=perscore;
        
         ball->getPhysicsBody()->applyImpulse(ballspeedup*dir);   //加速
         //更新score
@@ -518,7 +688,92 @@ bool HitBrick2::onConcactBegin(PhysicsContact& contact) {
 
         scorelabel->setString(strscore);
     }
+    //2xbrick
+    else if (nodeA->getTag() == tag2xbrick && nodeB->getTag() == tagball) {
+        removeChild(nodeA);
+        bricksnum--;
+        perscore = 2;
+        score+=perscore;
 
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+
+        //更新score
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
+    }
+    else if (nodeB->getTag() == tag2xbrick && nodeA->getTag() == tagball) {
+        removeChild(nodeB);
+        bricksnum--;
+        perscore = 2;
+        score += perscore;
+
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+        //更新score
+        strscore = StringUtils::format("%d", score);
+
+        scorelabel->setString(strscore);
+    }
+    //slowbrick
+    else if (nodeA->getTag() == tagslowbrick && nodeB->getTag() == tagball) {
+        removeChild(nodeA);
+        bricksnum--;
+        score += perscore;
+
+        ball->getPhysicsBody()->setVelocity(120 * dir);   //减速
+
+        //更新score
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
+    }
+    else if (nodeB->getTag() == tagslowbrick && nodeA->getTag() == tagball) {
+        removeChild(nodeB);
+        bricksnum--;
+        score += perscore;
+
+        ball->getPhysicsBody()->setVelocity(120*dir);   //减速
+        //更新score
+        strscore = StringUtils::format("%d", score);
+
+        scorelabel->setString(strscore);
+    }
+    //crazybrick
+    else if (nodeA->getTag() == tagcrazybrick && nodeB->getTag() == tagball) {
+        score += perscore;
+
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+
+        //更新score
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
+    }
+    else if (nodeB->getTag() == tagcrazybrick && nodeA->getTag() == tagball) {
+        score += perscore;
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+        //更新score
+        strscore = StringUtils::format("%d", score);
+
+        scorelabel->setString(strscore);
+    }
+    else if (nodeA->getTag() == tagcrazybrick && nodeB->getTag() == tagbrick) {
+        removeChild(nodeB);
+        bricksnum--;
+        score += perscore;
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+
+        //更新score
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
+    }
+    else if (nodeB->getTag() == tagcrazybrick && nodeA->getTag() == tagbrick) {
+        removeChild(nodeA);
+        bricksnum--;
+        score += perscore;
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+        //更新score
+        strscore = StringUtils::format("%d", score);
+
+        scorelabel->setString(strscore);
+    }
     if (bricksnum == 0)
     {
         Gameover();
@@ -545,58 +800,45 @@ void HitBrick2::Gameover()
         label1->setColor(Color3B(0, 0, 0));
         label1->setPosition(visibleSize.width / 2 + origin.x + 28, visibleSize.height / 2);
         this->addChild(label1, 1);
-        
-        switch (Gamechoice) {
-        case 1:
-            if (score > UserDefault::getInstance()->getIntegerForKey("s1hscore"))
-                UserDefault::getInstance()->setIntegerForKey("s1hscore", score);
-            if (Gametime > UserDefault::getInstance()->getIntegerForKey("s1time"))
-                UserDefault::getInstance()->setIntegerForKey("s1time", Gametime);
-            break;
-        case 2:
-            if (score > UserDefault::getInstance()->getIntegerForKey("s2hscore"))
-                UserDefault::getInstance()->setIntegerForKey("s2hscore", score);
-            if (Gametime > UserDefault::getInstance()->getIntegerForKey("s2time"))
-                UserDefault::getInstance()->setIntegerForKey("s2time", Gametime);
-            break;
-        case 3:
-            if (score > UserDefault::getInstance()->getIntegerForKey("s3hscore"))
-                UserDefault::getInstance()->setIntegerForKey("s3hscore", score);
-            if (Gametime > UserDefault::getInstance()->getIntegerForKey("s2time"))
-                UserDefault::getInstance()->setIntegerForKey("s2time", Gametime);
-            break;
-        default:
-            break;
-        }
-        UserDefault::getInstance()->flush();
-
-        //延时两秒返回Gamemenu
-        schedule(SEL_SCHEDULE(&HitBrick2::backGamemenu), 2.0f);
     }
     else {
         auto lab = Label::createWithTTF("DEFEAT!", "fonts/Marker Felt.ttf", 60);
         lab->setColor(Color3B(0, 0, 0));
         lab->setPosition(visibleSize.width / 2 + origin.x + 28, visibleSize.height / 2);
         this->addChild(lab, 1);
-
-        switch (Gamechoice) {
-        case 1:
-            UserDefault::getInstance()->setIntegerForKey("s1hscore", score);
-            break;
-        case 2:
-            UserDefault::getInstance()->setIntegerForKey("s2hscore", score);
-            break;
-        case 3:
-            UserDefault::getInstance()->setIntegerForKey("s3hscore", score);
-            break;
-        default:
-            break;
-        }
-        UserDefault::getInstance()->flush();
-
-        //延时两秒返回Gamemenu
-        schedule(SEL_SCHEDULE(&HitBrick2::backGamemenu), 2.0f);
     }
+    switch (Gamechoice) {
+    case 1:
+        if (score > UserDefault::getInstance()->getIntegerForKey("s1hscore"))
+            UserDefault::getInstance()->setIntegerForKey("s1hscore", score);
+        if (Gametime > UserDefault::getInstance()->getIntegerForKey("s1time"))
+            UserDefault::getInstance()->setIntegerForKey("s1time", Gametime);
+        break;
+    case 2:
+        if (score > UserDefault::getInstance()->getIntegerForKey("s2hscore"))
+            UserDefault::getInstance()->setIntegerForKey("s2hscore", score);
+        if (Gametime > UserDefault::getInstance()->getIntegerForKey("s2time"))
+            UserDefault::getInstance()->setIntegerForKey("s2time", Gametime);
+        break;
+    case 3:
+        if (score > UserDefault::getInstance()->getIntegerForKey("s3hscore"))
+            UserDefault::getInstance()->setIntegerForKey("s3hscore", score);
+        if (Gametime > UserDefault::getInstance()->getIntegerForKey("s3time"))
+            UserDefault::getInstance()->setIntegerForKey("s3time", Gametime);
+        break;
+    case 4:
+        if (score > UserDefault::getInstance()->getIntegerForKey("s4hscore"))
+            UserDefault::getInstance()->setIntegerForKey("s4hscore", score);
+        if (Gametime > UserDefault::getInstance()->getIntegerForKey("s4time"))
+            UserDefault::getInstance()->setIntegerForKey("s4time", Gametime);
+        break;
+    default:
+        break;
+    }
+    UserDefault::getInstance()->flush();
+
+    //延时两秒返回Gamemenu
+    schedule(SEL_SCHEDULE(&HitBrick2::backGamemenu), 2.0f);
 }
 
 void HitBrick2::backGamemenu(float dt) {

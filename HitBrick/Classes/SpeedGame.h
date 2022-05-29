@@ -28,7 +28,13 @@ public:
 	void addball();    //添加球
 	void addWall();    //添加边界
 	void addmap();     //添加地图
+
+	//添加砖块
 	void addBricks();  //从地图中添加砖块
+	void add2xbricks(); //添加2倍砖块
+	void addslowbricks(); //添加减速砖块
+	void addcrazybricks(); //添加疯狂砖块
+	void addstaticbricks(); //添加固定砖块
 
 	void addKeyListener(); // 添加键盘监听器
 	void addcontactListener(); //添加碰撞监听器
@@ -67,6 +73,10 @@ public:
 	int tagboard = 0;
 	int tagball = 1;
 	int tagbrick = 2;
+	int tag2xbrick = 3;
+	int tagslowbrick = 4;
+	int tagcrazybrick = 5;
+	int tagstaticbrick = 6;
 
 	int ballspeedup = 250;        //小球加速增益
 	int Gamechoice = 0;           //游戏关卡
@@ -76,6 +86,7 @@ public:
 	int bricksnum = 0;            //剩余砖块数
 	int speed = 6;                 //board speed
 	int Gametime=0;                   //游戏开始时间
+	int perscore=1;                 //击碎每块砖加的score
 
 	std::vector<Vec2> Brickpath;
 	std::string strscore;

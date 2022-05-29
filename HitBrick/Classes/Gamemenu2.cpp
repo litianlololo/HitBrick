@@ -29,13 +29,17 @@ bool Gamemenu2::init()
     auto game2 = MenuItemFont::create(ur2, CC_CALLBACK_1(Gamemenu2::menuClickCallBack, this));
     auto ur3 = FileUtils::getInstance()->getStringFromFile("Gamemenu/Gamemenu3.txt");
     auto game3 = MenuItemFont::create(ur3, CC_CALLBACK_1(Gamemenu2::menuClickCallBack, this));
+    auto ur4 = FileUtils::getInstance()->getStringFromFile("Gamemenu/Gamemenu4.txt");
+    auto game4 = MenuItemFont::create(ur4, CC_CALLBACK_1(Gamemenu2::menuClickCallBack, this));
     auto back = MenuItemFont::create("BACK", CC_CALLBACK_1(Gamemenu2::menuClickCallBack, this));
+
     //MainmenuTag
     game1->setTag(1);
     game2->setTag(2);
     game3->setTag(3);
+    game4->setTag(4);
     back->setTag(0);
-    auto menu = Menu::create(game1, game2, game3, back, NULL);
+    auto menu = Menu::create(game1, game2, game3, game4, back, NULL);
     menu->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2);
     addChild(menu);
     menu->alignItemsVertically();
@@ -65,6 +69,9 @@ void Gamemenu2::menuClickCallBack(Ref* sender)
             break;
         case 3:
             Gamechoice = 3;
+            break;
+        case 4:
+            Gamechoice = 4;
             break;
         default:
             break;
