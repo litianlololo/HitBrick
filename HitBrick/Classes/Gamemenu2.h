@@ -1,4 +1,4 @@
-#pragma once
+
 #pragma once
 #ifndef __Gamemenu2_H__
 #define __Gamemenu2_H__

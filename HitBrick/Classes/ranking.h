@@ -15,9 +15,12 @@ public:
 	virtual bool init();
 
 	void menuClickCallBack(Ref* sender);
-
+	void bg();
+	void getscore();
+	void gettime();
 	void update(float delta);
 
+	int gamechoice = 0;
 	int model = 0;
 	Size visibleSize;
 	Vec2 origin;

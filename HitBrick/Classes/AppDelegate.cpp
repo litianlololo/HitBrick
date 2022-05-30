@@ -28,6 +28,7 @@
 #include "Mainmenu.h"
 #include "Gamemenu.h"
 #include "store.h"
+#include "ranking.h"
 // #define USE_AUDIO_ENGINE 1
 
 #if USE_AUDIO_ENGINE

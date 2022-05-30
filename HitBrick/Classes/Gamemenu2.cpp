@@ -3,7 +3,8 @@
 #include "Gamemodel.h"
 #include "Mainmenu.h"
 #include "SpeedGame.h"
-#include "store.h"
+#include "store.h"]
+#include "ranking.h"
 
 USING_NS_CC;
 
@@ -91,6 +92,6 @@ void Gamemenu2::update(float delta) {
 //改变场景至具体游戏
 void Gamemenu2::Game()
 {
-    auto Gamescene = HitBrick2::createScene();
+    auto Gamescene = ranking::createScene();
     Director::getInstance()->replaceScene(Gamescene);
 }

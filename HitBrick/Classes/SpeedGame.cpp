@@ -35,16 +35,6 @@ bool HitBrick2::init()
     visibleSize = Director::getInstance()->getVisibleSize();                              //获取屏幕坐标
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    /*
-    //添加背景
-    //addBackGround();
-    label = Label::create();
-    label->setString(" ");
-    label->setPosition(Vec2(origin.x + visibleSize.width / 2,
-       300));
-    this->addChild(label,5);
-    */
-
     ifstart = 0;   //未发球
     startF = 0;    //
 
@@ -431,7 +421,7 @@ void HitBrick2::update(float delta) {
             startF = 60;
             break;
         case 4:
-            startF = 50;
+            startF = 80;
             break;
         }
       
@@ -807,38 +797,157 @@ void HitBrick2::Gameover()
         lab->setPosition(visibleSize.width / 2 + origin.x + 28, visibleSize.height / 2);
         this->addChild(lab, 1);
     }
-    switch (Gamechoice) {
-    case 1:
-        if (score > UserDefault::getInstance()->getIntegerForKey("s1hscore"))
-            UserDefault::getInstance()->setIntegerForKey("s1hscore", score);
-        if (Gametime > UserDefault::getInstance()->getIntegerForKey("s1time"))
-            UserDefault::getInstance()->setIntegerForKey("s1time", Gametime);
-        break;
-    case 2:
-        if (score > UserDefault::getInstance()->getIntegerForKey("s2hscore"))
-            UserDefault::getInstance()->setIntegerForKey("s2hscore", score);
-        if (Gametime > UserDefault::getInstance()->getIntegerForKey("s2time"))
-            UserDefault::getInstance()->setIntegerForKey("s2time", Gametime);
-        break;
-    case 3:
-        if (score > UserDefault::getInstance()->getIntegerForKey("s3hscore"))
-            UserDefault::getInstance()->setIntegerForKey("s3hscore", score);
-        if (Gametime > UserDefault::getInstance()->getIntegerForKey("s3time"))
-            UserDefault::getInstance()->setIntegerForKey("s3time", Gametime);
-        break;
-    case 4:
-        if (score > UserDefault::getInstance()->getIntegerForKey("s4hscore"))
-            UserDefault::getInstance()->setIntegerForKey("s4hscore", score);
-        if (Gametime > UserDefault::getInstance()->getIntegerForKey("s4time"))
-            UserDefault::getInstance()->setIntegerForKey("s4time", Gametime);
-        break;
-    default:
-        break;
-    }
+
+    settlement();
     UserDefault::getInstance()->flush();
 
     //延时两秒返回Gamemenu
     schedule(SEL_SCHEDULE(&HitBrick2::backGamemenu), 2.0f);
+}
+//排行榜结算
+void HitBrick2::settlement()
+{
+    ranks rank[6];
+
+    switch (Gamechoice) {
+    case 1:
+        rank[0].score = score;
+        rank[1].score = UserDefault::getInstance()->getIntegerForKey("s1hscore1");
+        rank[2].score = UserDefault::getInstance()->getIntegerForKey("s1hscore2");
+        rank[3].score = UserDefault::getInstance()->getIntegerForKey("s1hscore3");
+        rank[4].score = UserDefault::getInstance()->getIntegerForKey("s1hscore4");
+        rank[5].score = UserDefault::getInstance()->getIntegerForKey("s1hscore5");
+
+        rank[0].times = Gametime;
+        rank[1].times = UserDefault::getInstance()->getIntegerForKey("s1htime1");
+        rank[2].times = UserDefault::getInstance()->getIntegerForKey("s1htime2");
+        rank[3].times = UserDefault::getInstance()->getIntegerForKey("s1htime3");
+        rank[4].times = UserDefault::getInstance()->getIntegerForKey("s1htime4");
+        rank[5].times = UserDefault::getInstance()->getIntegerForKey("s1htime5");
+        break;
+    case 2:
+        rank[0].score = score;
+        rank[1].score = UserDefault::getInstance()->getIntegerForKey("s2hscore1");
+        rank[2].score = UserDefault::getInstance()->getIntegerForKey("s2hscore2");
+        rank[3].score = UserDefault::getInstance()->getIntegerForKey("s2hscore3");
+        rank[4].score = UserDefault::getInstance()->getIntegerForKey("s2hscore4");
+        rank[5].score = UserDefault::getInstance()->getIntegerForKey("s2hscore5");
+
+        rank[0].times = Gametime;
+        rank[1].times = UserDefault::getInstance()->getIntegerForKey("s2htime1");
+        rank[2].times = UserDefault::getInstance()->getIntegerForKey("s2htime2");
+        rank[3].times = UserDefault::getInstance()->getIntegerForKey("s2htime3");
+        rank[4].times = UserDefault::getInstance()->getIntegerForKey("s2htime4");
+        rank[5].times = UserDefault::getInstance()->getIntegerForKey("s2htime5");
+
+        break;
+    case 3:
+        rank[0].score = score;
+        rank[1].score = UserDefault::getInstance()->getIntegerForKey("s3hscore1");
+        rank[2].score = UserDefault::getInstance()->getIntegerForKey("s3hscore2");
+        rank[3].score = UserDefault::getInstance()->getIntegerForKey("s3hscore3");
+        rank[4].score = UserDefault::getInstance()->getIntegerForKey("s3hscore4");
+        rank[5].score = UserDefault::getInstance()->getIntegerForKey("s3hscore5");
+
+        rank[0].times = Gametime;
+        rank[1].times = UserDefault::getInstance()->getIntegerForKey("s3htime1");
+        rank[2].times = UserDefault::getInstance()->getIntegerForKey("s3htime2");
+        rank[3].times = UserDefault::getInstance()->getIntegerForKey("s3htime3");
+        rank[4].times = UserDefault::getInstance()->getIntegerForKey("s3htime4");
+        rank[5].times = UserDefault::getInstance()->getIntegerForKey("s3htime5");
+
+        break;
+    case 4:
+        rank[0].score = score;
+        rank[1].score = UserDefault::getInstance()->getIntegerForKey("s4hscore1");
+        rank[2].score = UserDefault::getInstance()->getIntegerForKey("s4hscore2");
+        rank[3].score = UserDefault::getInstance()->getIntegerForKey("s4hscore3");
+        rank[4].score = UserDefault::getInstance()->getIntegerForKey("s4hscore4");
+        rank[5].score = UserDefault::getInstance()->getIntegerForKey("s4hscore5");
+
+        rank[0].times = Gametime;
+        rank[1].times = UserDefault::getInstance()->getIntegerForKey("s4htime1");
+        rank[2].times = UserDefault::getInstance()->getIntegerForKey("s4htime2");
+        rank[3].times = UserDefault::getInstance()->getIntegerForKey("s4htime3");
+        rank[4].times = UserDefault::getInstance()->getIntegerForKey("s4htime4");
+        rank[5].times = UserDefault::getInstance()->getIntegerForKey("s4htime5");
+
+        break;
+    }
+
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5 - i; j++) {
+            if (rank[j].score < rank[j + 1].score) {
+                ranks temp = rank[j];
+                rank[j] = rank[j + 1];
+                rank[j + 1] = temp;
+            }
+            else if ((rank[j].score == rank[j + 1].score) && (rank[j].times > rank[j + 1].times))
+            {
+                ranks temp = rank[j];
+                rank[j] = rank[j + 1];
+                rank[j + 1] = temp;
+            }
+        }
+    }
+
+    switch (Gamechoice) {
+    case 1:
+        UserDefault::getInstance()->setIntegerForKey("s1hscore1", rank[0].score);
+        UserDefault::getInstance()->setIntegerForKey("s1hscore2", rank[1].score);
+        UserDefault::getInstance()->setIntegerForKey("s1hscore3", rank[2].score);
+        UserDefault::getInstance()->setIntegerForKey("s1hscore4", rank[3].score);
+        UserDefault::getInstance()->setIntegerForKey("s1hscore5", rank[4].score);
+
+        UserDefault::getInstance()->setIntegerForKey("s1htime1", rank[0].times);
+        UserDefault::getInstance()->setIntegerForKey("s1htime2", rank[1].times);
+        UserDefault::getInstance()->setIntegerForKey("s1htime3", rank[2].times);
+        UserDefault::getInstance()->setIntegerForKey("s1htime4", rank[3].times);
+        UserDefault::getInstance()->setIntegerForKey("s1htime5", rank[4].times);
+
+        break;
+    case 2:
+        UserDefault::getInstance()->setIntegerForKey("s2hscore1", rank[0].score);
+        UserDefault::getInstance()->setIntegerForKey("s2hscore2", rank[1].score);
+        UserDefault::getInstance()->setIntegerForKey("s2hscore3", rank[2].score);
+        UserDefault::getInstance()->setIntegerForKey("s2hscore4", rank[3].score);
+        UserDefault::getInstance()->setIntegerForKey("s2hscore5", rank[4].score);
+
+        UserDefault::getInstance()->setIntegerForKey("s2htime1", rank[0].times);
+        UserDefault::getInstance()->setIntegerForKey("s2htime2", rank[1].times);
+        UserDefault::getInstance()->setIntegerForKey("s2htime3", rank[2].times);
+        UserDefault::getInstance()->setIntegerForKey("s2htime4", rank[3].times);
+        UserDefault::getInstance()->setIntegerForKey("s2htime5", rank[4].times);
+        break;
+    case 3:
+        UserDefault::getInstance()->setIntegerForKey("s3hscore1", rank[0].score);
+        UserDefault::getInstance()->setIntegerForKey("s3hscore2", rank[1].score);
+        UserDefault::getInstance()->setIntegerForKey("s3hscore3", rank[2].score);
+        UserDefault::getInstance()->setIntegerForKey("s3hscore4", rank[3].score);
+        UserDefault::getInstance()->setIntegerForKey("s3hscore5", rank[4].score);
+
+        UserDefault::getInstance()->setIntegerForKey("s3htime1", rank[0].times);
+        UserDefault::getInstance()->setIntegerForKey("s3htime2", rank[1].times);
+        UserDefault::getInstance()->setIntegerForKey("s3htime3", rank[2].times);
+        UserDefault::getInstance()->setIntegerForKey("s3htime4", rank[3].times);
+        UserDefault::getInstance()->setIntegerForKey("s3htime5", rank[4].times);
+        break;
+    case 4:
+        UserDefault::getInstance()->setIntegerForKey("s4hscore1", rank[0].score);
+        UserDefault::getInstance()->setIntegerForKey("s4hscore2", rank[1].score);
+        UserDefault::getInstance()->setIntegerForKey("s4hscore3", rank[2].score);
+        UserDefault::getInstance()->setIntegerForKey("s4hscore4", rank[3].score);
+        UserDefault::getInstance()->setIntegerForKey("s4hscore5", rank[4].score);
+
+        UserDefault::getInstance()->setIntegerForKey("s4htime1", rank[0].times);
+        UserDefault::getInstance()->setIntegerForKey("s4htime2", rank[1].times);
+        UserDefault::getInstance()->setIntegerForKey("s4htime3", rank[2].times);
+        UserDefault::getInstance()->setIntegerForKey("s4htime4", rank[3].times);
+        UserDefault::getInstance()->setIntegerForKey("s4htime5", rank[4].times);
+        break;
+    default:
+        break;
+    }
 }
 
 void HitBrick2::backGamemenu(float dt) {

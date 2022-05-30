@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #ifndef __HITBRICK2_H__
 #define __HITBRICK2_H__
 
@@ -50,6 +49,7 @@ public:
 	void update(float dt);     //用于处理board移动 和小球蓄力
 
 	void Gameover();
+	void settlement();  //排行榜结算
 	void pauseClickCallBack(Ref* pSender);
 
 	void backGamemenu(float dt);
@@ -101,6 +101,13 @@ public:
 private:
 	PhysicsWorld* HitBrick_world;                       //带物理引擎的世界  HitBrick_world
 
+};
+
+class ranks
+{
+public:
+	int score;
+	int times;
 };
 
 #endif // __HITBRICK2_H__
