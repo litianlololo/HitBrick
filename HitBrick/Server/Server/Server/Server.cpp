@@ -1,0 +1,106 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <Winsock2.h>
+#include<vector>
+#include<map>
+
+using namespace std;
+const int playersnum = 2;
+int main()
+{
+    //定义发送缓冲区和接受缓冲区
+    char sendBuffer[128];
+    char recvBuffer[128];
+
+    WORD wVersionRequested;
+    WSADATA wsaData;
+    int err;
+
+    wVersionRequested = MAKEWORD(2, 2);//
+
+    err = WSAStartup(wVersionRequested, &wsaData);
+    if (err != 0)
+    {
+        return;
+    }
+
+    if (LOBYTE(wsaData.wVersion) != 1 || HIBYTE(wsaData.wVersion) != 1)
+    {
+        WSACleanup();
+        return;
+    }
+
+    //服务端地址
+    SOCKADDR_IN addrSrv;
+    //客户端地址
+    SOCKADDR_IN addrClient;
+    //客户端地址集合
+    map<SOCKET, sockaddr_in>addrplayers;
+
+    addrSrv.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+    addrSrv.sin_family = AF_INET;
+    addrSrv.sin_port = htons(1000);  
+    
+    //创建套接字
+    SOCKET server = socket(AF_INET, SOCK_STREAM, 0);
+    unsigned long u1 = 1;
+    ioctlsocket(server, FIONBIO, (unsigned long*)&u1);//设置为非阻塞
+
+    bind(server, (SOCKADDR*)&addrSrv, sizeof(SOCKADDR));  //套接字和机器上的一定的端口绑定
+
+    //设置套接字为监听状态
+    listen(server, 2);   //目前仅需接受两个玩家
+
+    vector<SOCKET>players;//客户端集合
+    vector<SOCKET>::iterator pl;  //players集合的迭代器
+    pl = players.begin();         //先指向第一个玩家
+
+    while (1)
+    {
+        int len = sizeof(SOCKADDR);
+        SOCKET client = accept(server, (SOCKADDR*)&addrClient, &len);    //接受连接请求
+
+        //准备阶段
+        if (client != INVALID_SOCKET && players.size() <= playersnum)
+        {
+            players.push_back(client);
+            addrplayers[client] = addrClient;
+
+            send(players.back(), "connected", sizeof("connected"), 0);
+            cout << inet_ntoa(addrClient.sin_addr) << "已加入连接" << endl << "当前连接数: " << players.size() << endl;
+
+            //已匹配两位玩家
+            if (players.size() == playersnum)
+            {
+                //Sleep(300);
+                send(*pl, "matched", sizeof("matched"), 0);
+                send(*(++pl), "matched", sizeof("matched"), 0);
+            }
+        }
+        if (players.size() == playersnum) {
+            //接收客户端信息
+            for (pl = players.begin(); pl != players.end(); ++pl)
+            {
+                int recvLength = recv(*pl, recvBuffer, 128, 0);          //
+            }
+        }
+
+
+
+
+
+        char sendBuf[50];
+        sprintf(sendBuf, "Welcome %s to here!", inet_ntoa(addrClient.sin_addr));
+        send(client, sendBuf, strlen(sendBuf) + 1, 0);
+        char recvBuf[50];
+        recv(client, recvBuf, 50, 0);
+        printf("%s\n", recvBuf);
+        //关闭套接字
+        closesocket(client);
+    }
+
+    //释放DLL资源
+    WSACleanup();
+
+    return 0;
+}

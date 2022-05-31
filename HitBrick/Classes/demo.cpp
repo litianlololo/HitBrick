@@ -46,7 +46,7 @@ bool HitBrick::init()
 
     ifstart = 0;   //未发球
     startF = 0;    //
-    
+
     //添加地图
     addmap();
     //添加板
@@ -57,6 +57,10 @@ bool HitBrick::init()
     addWall();
     //添加砖块
     addBricks();
+    add2xbricks(); //添加2倍砖块
+    addslowbricks(); //添加减速砖块
+    addcrazybricks(); //添加疯狂砖块
+    addstaticbricks(); //添加固定砖块
     //添加暂停按钮
     addbutton();
     //添加分数
@@ -440,6 +444,150 @@ void HitBrick::addBricks()
     }
 }
 
+void HitBrick::add2xbricks() {
+    TMXObjectGroup* objectGroup = map->getObjectGroup("2xbrick");
+    ValueVector values = objectGroup->getObjects();
+
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("brick2x.png");
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+
+        addChild(it);
+        it->setTag(tag2xbrick);
+
+        bricksnum++;
+        // Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
+    }
+}
+
+void HitBrick::addslowbricks() {
+    TMXObjectGroup* objectGroup = map->getObjectGroup("slowbrick");
+    ValueVector values = objectGroup->getObjects();
+
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("orangebrick.png");
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+
+        addChild(it);
+        it->setTag(tagslowbrick);
+
+        bricksnum++;
+        // Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
+    }
+}
+
+void HitBrick::addcrazybricks() {
+    TMXObjectGroup* objectGroup = map->getObjectGroup("crazybrick");
+    ValueVector values = objectGroup->getObjects();
+
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("crazybrick.png");
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        //BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+        addChild(it);
+        it->setTag(tagcrazybrick);
+    }
+}
+
+void HitBrick::addstaticbricks() {
+    TMXObjectGroup* objectGroup = map->getObjectGroup("staticbrick");
+    ValueVector values = objectGroup->getObjects();
+
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("staticbrick.png");
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+        addChild(it);
+        it->setTag(tagstaticbrick);
+    }
+}
+
 void HitBrick::onKeyPressed(EventKeyboard::KeyCode keycode, Event* event)                 
 {
     //键盘按下
@@ -476,11 +624,16 @@ void HitBrick::setPhysicsWorld(PhysicsWorld* world)
 bool HitBrick::onConcactBegin(PhysicsContact& contact) {
     auto nodeA = contact.getShapeA()->getBody()->getNode();
     auto nodeB = contact.getShapeB()->getBody()->getNode();
-    
+    //运动方向
+    float angle = ball->getPhysicsBody()->getRotation() * 2 / 360 * 3.1415f;
+    Vec2 dir = dir = Vec2(sin(angle), cos(angle));
     if (nodeA->getTag() == tagbrick && nodeB->getTag() == tagball) {
         removeChild(nodeA);
         bricksnum--;
-        score++;
+        score += perscore;
+
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+
         //更新score
         strscore = StringUtils::format("%d", score);
         scorelabel->setString(strscore);
@@ -488,12 +641,100 @@ bool HitBrick::onConcactBegin(PhysicsContact& contact) {
     else if (nodeB->getTag() == tagbrick && nodeA->getTag() == tagball) {
         removeChild(nodeB);
         bricksnum--;
-        score++;
+        score += perscore;
+
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+        //更新score
+        strscore = StringUtils::format("%d", score);
+
+        scorelabel->setString(strscore);
+    }
+    //2xbrick
+    else if (nodeA->getTag() == tag2xbrick && nodeB->getTag() == tagball) {
+        removeChild(nodeA);
+        bricksnum--;
+        perscore = 2;
+        score += perscore;
+
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+
         //更新score
         strscore = StringUtils::format("%d", score);
         scorelabel->setString(strscore);
     }
+    else if (nodeB->getTag() == tag2xbrick && nodeA->getTag() == tagball) {
+        removeChild(nodeB);
+        bricksnum--;
+        perscore = 2;
+        score += perscore;
 
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+        //更新score
+        strscore = StringUtils::format("%d", score);
+
+        scorelabel->setString(strscore);
+    }
+    //slowbrick
+    else if (nodeA->getTag() == tagslowbrick && nodeB->getTag() == tagball) {
+        removeChild(nodeA);
+        bricksnum--;
+        score += perscore;
+
+        ball->getPhysicsBody()->setVelocity(120 * dir);   //减速
+
+        //更新score
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
+    }
+    else if (nodeB->getTag() == tagslowbrick && nodeA->getTag() == tagball) {
+        removeChild(nodeB);
+        bricksnum--;
+        score += perscore;
+
+        ball->getPhysicsBody()->setVelocity(120 * dir);   //减速
+        //更新score
+        strscore = StringUtils::format("%d", score);
+
+        scorelabel->setString(strscore);
+    }
+    //crazybrick
+    else if (nodeA->getTag() == tagcrazybrick && nodeB->getTag() == tagball) {
+        score += perscore;
+
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+
+        //更新score
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
+    }
+    else if (nodeB->getTag() == tagcrazybrick && nodeA->getTag() == tagball) {
+        score += perscore;
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+        //更新score
+        strscore = StringUtils::format("%d", score);
+
+        scorelabel->setString(strscore);
+    }
+    else if (nodeA->getTag() == tagcrazybrick && nodeB->getTag() == tagbrick) {
+        removeChild(nodeB);
+        bricksnum--;
+        score += perscore;
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+
+        //更新score
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
+    }
+    else if (nodeB->getTag() == tagcrazybrick && nodeA->getTag() == tagbrick) {
+        removeChild(nodeA);
+        bricksnum--;
+        score += perscore;
+        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+        //更新score
+        strscore = StringUtils::format("%d", score);
+
+        scorelabel->setString(strscore);
+    }
     if (bricksnum == 0)
     {
         Gameover();

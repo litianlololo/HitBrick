@@ -421,7 +421,7 @@ void HitBrick2::update(float delta) {
             startF = 60;
             break;
         case 4:
-            startF = 80;
+            startF = 70;
             break;
         }
       

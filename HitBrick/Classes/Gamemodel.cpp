@@ -4,7 +4,7 @@
 #include "Gamemenu2.h"
 #include "Mainmenu.h"
 #include "demo.h"
-#include "store.h"
+
 
 USING_NS_CC;
 
@@ -31,12 +31,15 @@ bool Gamemodel::init()
     auto game1 = MenuItemFont::create(ur1, CC_CALLBACK_1(Gamemodel::menuClickCallBack, this));
     auto ur2 = FileUtils::getInstance()->getStringFromFile("Gamemodel/Gamemodel2.txt");
     auto game2 = MenuItemFont::create(ur2, CC_CALLBACK_1(Gamemodel::menuClickCallBack, this));
+    auto ur3 = FileUtils::getInstance()->getStringFromFile("Gamemodel/Gamemodel3.txt");
+    auto game3 = MenuItemFont::create(ur3, CC_CALLBACK_1(Gamemodel::menuClickCallBack, this));
     auto back = MenuItemFont::create("BACK", CC_CALLBACK_1(Gamemodel::menuClickCallBack, this));
     //MainmenuTag
     game1->setTag(1);
     game2->setTag(2);
+    game3->setTag(3);
     back->setTag(0);
-    auto menu = Menu::create(game1, game2, back, NULL);
+    auto menu = Menu::create(game1, game2, game3 , back, NULL);
     menu->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2);
     addChild(menu);
     menu->alignItemsVertically();
@@ -64,6 +67,8 @@ void Gamemodel::menuClickCallBack(Ref* sender)
         case 2:
            model = 2;
             break;
+        case 3:
+            model = 3;
         default:
             break;
         }
@@ -77,6 +82,8 @@ void Gamemodel::update(float delta) {
     }
     else if (model == 2)
         Game2();
+    else
+        Game3();
 }
 
 //改变场景至关卡选择
@@ -87,6 +94,12 @@ void Gamemodel::Game1()
 }
 
 void Gamemodel::Game2()
+{
+    auto Gamescene2 = Gamemenu2::createScene();
+    Director::getInstance()->replaceScene(Gamescene2);
+}
+
+void Gamemodel::Game3()
 {
     auto Gamescene2 = Gamemenu2::createScene();
     Director::getInstance()->replaceScene(Gamescene2);

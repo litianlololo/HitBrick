@@ -2,6 +2,8 @@
 #include "Mainmenu.h"
 #include "Gamemenu.h"
 #include "Gamemodel.h"
+#include "DESCRIPTION.h"
+#include "ui/CocosGUI.h"
 USING_NS_CC;
 
 
@@ -35,6 +37,7 @@ bool Mainmenu::init()
     addChild(menu);
     menu->alignItemsVertically();
 
+
     return true;
 }
 
@@ -45,6 +48,7 @@ void Mainmenu::menuClickCallBack(Ref* sender)
     if (NULL != node)
     {
         auto scene = Gamemodel::createScene();
+        auto Dscene = DESCRIPTION::createScene();
         switch (tag)
         {
         case 1:
@@ -52,7 +56,7 @@ void Mainmenu::menuClickCallBack(Ref* sender)
             Director::getInstance()->replaceScene(scene);
             break;
         case 2:
-            
+            Director::getInstance()->replaceScene(Dscene);
             break;
         default:
             break;

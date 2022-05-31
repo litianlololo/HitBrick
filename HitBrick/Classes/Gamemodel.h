@@ -20,6 +20,8 @@ public:
 	void update(float delta);
 	void Game1();
 	void Game2();
+	void Game3();
+
 
 	int model = 0;
 	Size visibleSize;
