@@ -109,6 +109,7 @@ public:
 	void addball2();
 	void addboard2();
 	void DataSend();
+	void DataRecv();
 	std::string DataCMP(int value);    //数据压缩打包成string
 	cocos2d::TMXTiledMap* map2;
 	Sprite* ball2;

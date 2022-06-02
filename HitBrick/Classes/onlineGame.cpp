@@ -10,8 +10,6 @@ USING_NS_CC;
 
 Scene* onlineGame::createScene() {
 
-    srand((unsigned)time(NULL));
-
     auto scene = Scene::createWithPhysics();
 
     scene->getPhysicsWorld()->setAutoStep(true);
@@ -41,6 +39,7 @@ bool onlineGame::init()
     serveraddr.sin_family = AF_INET;//对这个类进行初始化
     serveraddr.sin_port = htons(10000);
     serveraddr.sin_addr.s_addr = inet_addr(IPAddr.c_str());
+
     /*
     while (1)
     {
@@ -234,7 +233,7 @@ void onlineGame::addWall()
     Wall->setPosition(visibleSize.width / 2 + origin.x + 125, 115);
     Wall->setPhysicsBody(WallBody);
     addChild(Wall);
-
+    /*
     float bottom2 = -50;
     float over2 = 282;
     float right2 = 453;
@@ -249,7 +248,7 @@ void onlineGame::addWall()
     Wall2->setPosition(visibleSize.width / 2 + origin.x + 125, 115);
     Wall2->setPhysicsBody(WallBody2);
     addChild(Wall2);
-
+    */
 }
 //键盘监视器
 void onlineGame::addKeyListener()
@@ -436,6 +435,7 @@ void onlineGame::update(float delta) {
     board->runAction(movebyboard);
 
     DataSend();
+    DataRecv();
 
     return;
 }
@@ -682,6 +682,12 @@ void onlineGame::DataSend()
     dataSend += DataCMP(static_cast<int>(ball->getPositionY() - map->getPositionY()));
 
     send(client, dataSend.c_str(), dataSend.size(), 0);
+}
+void onlineGame::DataRecv()
+{
+    char dataRecv[128];
+    //与map左下角的相对位置
+    recv(client, dataRecv, 128, 0);
 }
 
 std::string onlineGame::DataCMP(int value)

@@ -106,11 +106,16 @@ void Matching::update(float dt)
         //ÉèÖÃÎªstart°´Å¥
         match->setEnabled(true);
         match->setString("strat");
-        match->setTag(2);
-        //startButton->setEnabled(true);
+        match->setTag(3);
     }
-    else if (str == "start")
+    if (str == "start")
     {
-        Director::getInstance()->replaceScene(TransitionFade::create(2.0f, onlineGame::createScene()));
+        matchLabel->setString("???????");
+        Start();
     }
+}
+void Matching::Start()
+{
+    auto Dscene = onlineGame::createScene();
+    Director::getInstance()->replaceScene(Dscene);
 }

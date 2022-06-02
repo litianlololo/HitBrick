@@ -26,7 +26,7 @@ public:
     void update(float dt);
     void menuClickCallBack(Ref* sender);
     void Matched();
-
+    void Start();
     cocos2d::Label* matchLabel;
 
     Menu* menu;
