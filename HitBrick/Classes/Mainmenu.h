@@ -19,6 +19,7 @@ public:
 	Size visibleSize;
 	Vec2 origin;
 
+
 	CREATE_FUNC(Mainmenu);
 
 };
