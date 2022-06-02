@@ -4,7 +4,7 @@
 #include "Gamemenu2.h"
 #include "Mainmenu.h"
 #include "demo.h"
-#include "Matching.h"
+
 
 USING_NS_CC;
 
@@ -82,7 +82,7 @@ void Gamemodel::update(float delta) {
     }
     else if (model == 2)
         Game2();
-    else if(model==3)
+    else
         Game3();
 }
 
@@ -101,6 +101,6 @@ void Gamemodel::Game2()
 
 void Gamemodel::Game3()
 {
-    auto Gamescene3 = Matching::createScene();
-    Director::getInstance()->replaceScene(Gamescene3);
+    auto Gamescene2 = Gamemenu2::createScene();
+    Director::getInstance()->replaceScene(Gamescene2);
 }
