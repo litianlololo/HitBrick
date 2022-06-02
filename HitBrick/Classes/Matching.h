@@ -4,28 +4,36 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
+#include<string>
 #include <WINSOCK2.H>
 #pragma comment(lib,"ws2_32.lib")
-typedef int	socklen_t;
-typedef int	SOCKET;
+
+//typedef int	socklen_t;
+
+
 
 USING_NS_CC;
 
 class Matching : public Layer
 {
 public:
-    
+    Size visibleSize;
+    Vec2 origin;
     static Scene* createScene();
     
-    Sprite* background_1;
-    Sprite* background_2;
 
     virtual bool init();
     void update(float dt);
-    void backtomodel(cocos2d::Ref* pSender);
+    void menuClickCallBack(Ref* sender);
+    void Matched();
 
     cocos2d::Label* matchLabel;
 
+    Menu* menu;
+    MenuItemFont* match;
+
+    char dataRecv[128];
+    std::string str="";
     CREATE_FUNC(Matching);
 };
 #endif //_MATCHING_H_
