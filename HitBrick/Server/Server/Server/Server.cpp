@@ -70,6 +70,7 @@ int main()
     bool Astart2 = false;
     bool Bstart2 = false;
 
+    int ret = 0;
     while (1)
     {
         bool newrecv = 0;
@@ -77,170 +78,193 @@ int main()
         int client = accept(server, (SOCKADDR*)&addrClient, &len);    //接受连接请求
 
         //准备阶段
-        if (client != INVALID_SOCKET)
-        {
-            players.push_back(client);
-            addrplayers[client] = addrClient;
-
-            send(players.back(), "connected", sizeof("connected"), 0);
-            cout << "已加入连接" << endl << "当前连接数: " << players.size() << endl;
-
-            //已匹配两位玩家
-
-            if (players.size() == playersnum)
+        if (players.size()!=playersnum) {
+            if (client != INVALID_SOCKET)
             {
-                Sleep(300);
-                send(players[0], "matched", sizeof("matched"), 0);
-                send(players[1], "matched", sizeof("matched"), 0);
-                cout << "matched" << endl;
+                players.push_back(client);
+                addrplayers[client] = addrClient;
+
+                send(players.back(), "connected", sizeof("connected"), 0);
+                cout << "已加入连接" << endl << "当前连接数: " << players.size() << endl;
+
+                //已匹配两位玩家
+
+                if (players.size() == playersnum)
+                {
+                    Sleep(300);
+                    send(players[0], "matched", sizeof("matched"), 0);
+                    send(players[1], "matched", sizeof("matched"), 0);
+                    cout << "matched" << endl;
+                }
             }
-            // else if(players.size() != playersnum && firstmatched) {
-             //    send(players[0], "connected", sizeof("connected"), 0);
-             //}
         }
 
-        //正式游戏阶段
-
-        if (players.size() == playersnum) {
-            //接收A客户端信息
-            int recvLengthA = recv(players[0], recvBufferA, 128, 0);          //接收信息
-            if (recvLengthA < 0)  //无新信息
-            {
-                newrecv = 0;
-            }
-            {
-                newrecv = 1;
-                cout << "playerA Message:" << recvBufferA << endl;
+        FD_ZERO(&readfd);//初始化
+        for (int i = 0; i < players.size(); i++)
+        {
+            FD_SET((int)(players[i]), &readfd);//检查
+        }
+        //查看是否有数据发送
+        ret = 0;
+        if (!players.empty())
+        {
+            timeval tv = { 0,0 };
+            ret = select(players[players.size() - 1] + 1, &readfd, NULL, NULL, &tv);
+        }
+        //处理数据
+        if (ret > 0)
+        {
+            //正式游戏阶段
+            if (players.size() == playersnum) {
+                //接收A客户端信息
+                Sleep(1000);
+                int recvLengthA = recv(players[0], recvBufferA, 128, 0);          //接收信息
                 string MsgA = string(recvBufferA);           //读取的信息存入Msg
-                if (MsgA == "Quit")                         //玩家A退出
-                {
-                    cout << "playerA quit" << endl;
-                    strcpy(sendBuffer, "Quit");
-                    send(players[1], sendBuffer, 128, 0);
-                    deleteplayers.push_back(players[0]);
-                }
-                else if (MsgA == "Win")                      //有玩家获胜
-                {
-                    cout << "playerA win" << endl;
-                    strcpy(sendBuffer, "Win");
-                    send(players[1], sendBuffer, 128, 0);
-                    deleteplayers.push_back(players[0]);
-                }
-                else if (MsgA == "ready") {
-                    Astart = 1;
-                }
-                else if(Bstart2) {
-                    //发送给B玩家 运动信息
-                    int ret1 = send(players[1], MsgA.c_str(), MsgA.size(), 0);
-                    Sleep(100);
-                }
-            }
-            //接收B客户端信息
-            int recvLengthB = recv(players[1], recvBufferB, 128, 0);          //接收信息
-            if (recvLengthB < 0)  //无新信息
-            {
-                newrecv = 0;
-            }
-            else
-            {
-                newrecv = 1;
-                cout << "playerB Message:" << recvBufferB << endl;
-                string MsgB = string(recvBufferB);           //读取的信息存入Msg
-                if (MsgB == "Quit")                         //玩家A退出
-                {
-                    cout << "playerB quit" << endl;
-                    strcpy(sendBuffer, "Quit");
-                    send(players[0], sendBuffer, 128, 0);
-                    deleteplayers.push_back(players[1]);
-                }
-                else if (MsgB == "Win")                      //有玩家获胜
-                {
-                    cout << "playerB win" << endl;
-                    strcpy(sendBuffer, "Win");
-                    send(players[0], sendBuffer, 128, 0);
-                    deleteplayers.push_back(players[1]);
-                }
-                else if (MsgB == "ready") {
-                    Bstart = 1;
-                }
-                else if(Astart2) {
-                    //发送给A玩家 运动信息
-                    int ret2 = send(players[0], MsgB.c_str(), MsgB.size(), 0);
-                    Sleep(100);
-
-                }
-            }
-            /*
-            //cout << "2" << endl;
-            for (pl = players.begin(); pl != players.end(); ++pl)
-            {
-                int recvLength = recv(players[0], recvBuffer, 128, 0);          //接收信息
-                if (recvLength < 0)  //无新信息
+                if (recvLengthA < 0)  //无新信息
                 {
                     newrecv = 0;
-                    //continue;
                 }
-                else {               //有新信息
+                else
+                {
                     newrecv = 1;
-                    cout << "Client Message:" << recvBuffer << endl;
-                    string Msg = string(recvBuffer);           //读取的信息存入Msg
-                    if (Msg == "Quit")                         //有玩家退出
-                    {
+                    cout << "playerA Message:" << recvBufferA << endl;
 
-                        for (vector<SOCKET>::iterator pl2 = players.begin(); pl2 != players.end(); ++pl2) {    //向另一玩家发出退出信息
-                            if (pl2 != pl) {
-                                cout << "player quit" << endl;
-                                strcpy(sendBuffer, "Quit");
-                                send(*pl2, sendBuffer, 128, 0);
-                            }
-                        }
-                        deleteplayers.push_back(*pl);
-                    }
-                    else if (Msg == "Win")                      //有玩家获胜
+                    if (MsgA == "Quit")                         //玩家A退出
                     {
-                        for (vector<SOCKET>::iterator pl2 = players.begin(); pl2 != players.end(); ++pl2) {    //向另一玩家发出退出信息
-                            if (pl2 != pl) {
-                                cout << "player win" << endl;
-                                strcpy(sendBuffer, "Win");
-                                send(*pl2, sendBuffer, 128, 0);
-                            }
-                        }
-                        deleteplayers.push_back(*pl);
+                        cout << "playerA quit" << endl;
+                        strcpy(sendBuffer, "Quit");
+                        send(players[1], sendBuffer, 128, 0);
+                        deleteplayers.push_back(players[0]);
                     }
-                    else if (Msg == "ready") {
-                        if (pl == players.begin())
+                    else if (MsgA == "Win")                      //有玩家获胜
+                    {
+                        cout << "playerA win" << endl;
+                        strcpy(sendBuffer, "Win");
+                        send(players[1], sendBuffer, 128, 0);
+                        deleteplayers.push_back(players[0]);
+                    }
+                    else if (Bstart2) {
+                        //发送给B玩家 运动信息
+                        int ret1 = send(players[1], MsgA.c_str(), MsgA.size(), 0);
+                        Sleep(100);
+                    }
+                }
+                if (MsgA == "ready") {
+                    Astart = 1;
+                }
+                //接收B客户端信息
+                Sleep(1000);
+                int recvLengthB = recv(players[1], recvBufferB, 128, 0);          //接收信息
+                string MsgB = string(recvBufferB);           //读取的信息存入Msg
+                if (recvLengthB < 0)  //无新信息
+                {
+                    newrecv = 0;
+                }
+                else
+                {
+                    newrecv = 1;
+                    cout << "playerB Message:" << recvBufferB << endl;
+
+                    if (MsgB == "Quit")                         //玩家A退出
+                    {
+                        cout << "playerB quit" << endl;
+                        strcpy(sendBuffer, "Quit");
+                        send(players[0], sendBuffer, 128, 0);
+                        deleteplayers.push_back(players[1]);
+                    }
+                    else if (MsgB == "Win")                      //有玩家获胜
+                    {
+                        cout << "playerB win" << endl;
+                        strcpy(sendBuffer, "Win");
+                        send(players[0], sendBuffer, 128, 0);
+                        deleteplayers.push_back(players[1]);
+                    }
+                    else if (Astart2) {
+                        //发送给A玩家 运动信息
+                        int ret2 = send(players[0], MsgB.c_str(), MsgB.size(), 0);
+                        Sleep(100);
+
+                    }
+
+                }
+                if (MsgB == "ready") {
+                    Bstart = 1;
+                }
+                /*
+                //cout << "2" << endl;
+                for (pl = players.begin(); pl != players.end(); ++pl)
+                {
+                    int recvLength = recv(players[0], recvBuffer, 128, 0);          //接收信息
+                    if (recvLength < 0)  //无新信息
+                    {
+                        newrecv = 0;
+                        //continue;
+                    }
+                    else {               //有新信息
+                        newrecv = 1;
+                        cout << "Client Message:" << recvBuffer << endl;
+                        string Msg = string(recvBuffer);           //读取的信息存入Msg
+                        if (Msg == "Quit")                         //有玩家退出
                         {
-                            Astart = 1;
+
+                            for (vector<SOCKET>::iterator pl2 = players.begin(); pl2 != players.end(); ++pl2) {    //向另一玩家发出退出信息
+                                if (pl2 != pl) {
+                                    cout << "player quit" << endl;
+                                    strcpy(sendBuffer, "Quit");
+                                    send(*pl2, sendBuffer, 128, 0);
+                                }
+                            }
+                            deleteplayers.push_back(*pl);
                         }
-                        else {
-                            Bstart = 1;
+                        else if (Msg == "Win")                      //有玩家获胜
+                        {
+                            for (vector<SOCKET>::iterator pl2 = players.begin(); pl2 != players.end(); ++pl2) {    //向另一玩家发出退出信息
+                                if (pl2 != pl) {
+                                    cout << "player win" << endl;
+                                    strcpy(sendBuffer, "Win");
+                                    send(*pl2, sendBuffer, 128, 0);
+                                }
+                            }
+                            deleteplayers.push_back(*pl);
                         }
+                        else if (Msg == "ready") {
+                            if (pl == players.begin())
+                            {
+                                Astart = 1;
+                            }
+                            else {
+                                Bstart = 1;
+                            }
+                        }
+                        //发送游戏信息
+                        /*
+                        for (vector<SOCKET>::iterator pl2 = players.begin(); pl2 != players.end(); ++pl2) {    //向另一玩家发出退出信息
+                            if (pl2 != pl) {
+                                send(*pl2, recvBuffer, 128, 0);
+                            }
+                        }*/
+
+                        //}*/
+
+                if (Astart && Bstart)
+                {
+
+                    send(players[0], "start", sizeof("start"), 0);
+                    send(players[1], "start", sizeof("start"), 0);
+                    Sleep(3000);
+                    Astart2 = true;
+                    Bstart2 = true;
+                    Astart = false;
+                    Bstart = false;//改掉避免持续发送
+                }
+
+
+                if (!deleteplayers.empty())  //已有玩家退出
+                {
+                    for (vector<SOCKET>::iterator pl = players.begin(); pl != players.end(); ++pl) {    //向玩家发出退出信息
+                        //关闭所有客户端套接字
+                        closesocket(*pl);
                     }
-                    //发送游戏信息
-                    /*
-                    for (vector<SOCKET>::iterator pl2 = players.begin(); pl2 != players.end(); ++pl2) {    //向另一玩家发出退出信息
-                        if (pl2 != pl) {
-                            send(*pl2, recvBuffer, 128, 0);
-                        }
-                    }*/
-
-                    //}*/
-
-            if (Astart && Bstart)
-            {
-                send(players[0], "start", sizeof("start"), 0);
-                send(players[1], "start", sizeof("start"), 0);
-                //Sleep(300);
-                Astart2 = true;
-                Bstart2 = true;
-                Astart = false;
-                Bstart = false;//改掉避免持续发送
-            }
-            if (!deleteplayers.empty())  //已有玩家退出
-            {
-                for (vector<SOCKET>::iterator pl = players.begin(); pl != players.end(); ++pl) {    //向玩家发出退出信息
-                    //关闭所有客户端套接字
-                    closesocket(*pl);
                 }
             }
         }

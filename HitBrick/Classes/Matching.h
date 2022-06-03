@@ -31,6 +31,7 @@ public:
 
     Menu* menu;
     MenuItemFont* match;
+    MenuItemFont* start;
 
     char dataRecv[128];
     std::string str="";

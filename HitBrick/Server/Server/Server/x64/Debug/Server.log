@@ -1,6 +1,10 @@
 ﻿  Server.cpp
-D:\github_desktop\HitBrick\HitBrick\Server\Server\Server\Server.cpp(77,20): warning C4244: “初始化”: 从“SOCKET”转换到“int”，可能丢失数据
-D:\github_desktop\HitBrick\HitBrick\Server\Server\Server\Server.cpp(134,77): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
-D:\github_desktop\HitBrick\HitBrick\Server\Server\Server\Server.cpp(168,77): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
-D:\github_desktop\HitBrick\HitBrick\Server\Server\Server\Server.cpp(46,12): warning C4101: “readfd”: 未引用的局部变量
+D:\github_desktop\HitBrick\HitBrick\Server\Server\Server\Server.cpp(78,20): warning C4244: “初始化”: 从“SOCKET”转换到“int”，可能丢失数据
+D:\github_desktop\HitBrick\HitBrick\Server\Server\Server\Server.cpp(112,54): warning C4244: “参数”: 从“_Ty”转换到“int”，可能丢失数据
+          with
+          [
+              _Ty=SOCKET
+          ]
+D:\github_desktop\HitBrick\HitBrick\Server\Server\Server\Server.cpp(148,81): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+D:\github_desktop\HitBrick\HitBrick\Server\Server\Server\Server.cpp(184,81): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
   Server.vcxproj -> D:\github_desktop\HitBrick\HitBrick\Server\Server\x64\Debug\Server.exe

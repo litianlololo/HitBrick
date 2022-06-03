@@ -20,7 +20,7 @@ int main()
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	serveraddr.sin_family = AF_INET;//对这个类进行初始化
 	serveraddr.sin_port = htons(10000);
-	std::string ipaddr="192.168.1.100";
+	std::string ipaddr="192.168.1.102";
 	serveraddr.sin_addr.s_addr = inet_addr(ipaddr.c_str());
 
 

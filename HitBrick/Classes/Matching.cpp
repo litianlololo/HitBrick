@@ -6,7 +6,8 @@
 USING_NS_CC;
 
 SOCKET client;
-std::string IPAddr = "192.168.1.100";
+std::string IPAddr = "192.168.1.102";
+//std::string IPAddr = "192.168.1.100";
 Scene* Matching::createScene()
 {
     auto scene = Scene::create();
@@ -24,10 +25,13 @@ bool Matching::init()
     auto ur1 = FileUtils::getInstance()->getStringFromFile("online/matching.txt");
     match = MenuItemFont::create(ur1, CC_CALLBACK_1(Matching::menuClickCallBack, this));
     auto back = MenuItemFont::create("BACK", CC_CALLBACK_1(Matching::menuClickCallBack, this));
+    start = MenuItemFont::create("start", CC_CALLBACK_1(Matching::menuClickCallBack, this));
     //MainmenuTag
     match->setTag(1);
+    start->setTag(2);
+    start->setEnabled(false);
     back->setTag(0);
-    menu = Menu::create(match, back, NULL);
+    menu = Menu::create(match, start,back, NULL);
     menu->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2);
     addChild(menu);
     menu->alignItemsVertically();
@@ -66,15 +70,18 @@ void Matching::menuClickCallBack(Ref* sender)
             serveraddr.sin_addr.s_addr = inet_addr(IPAddr.c_str());
             client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-            matchLabel = Label::createWithTTF("Failed", "fonts/Marker Felt.ttf", 24);
+            matchLabel = Label::createWithTTF("connecting", "fonts/Marker Felt.ttf", 24);
             matchLabel->setPosition(Vec2(visibleSize.width / 2 + origin.x, 100));
             this->addChild(matchLabel);
 
 
             ioctlsocket(client, FIONBIO, (unsigned long*)&u1);
-            connect(client, (sockaddr*)&serveraddr, sizeof(serveraddr));
+            if (!connect(client, (sockaddr*)&serveraddr, sizeof(serveraddr)))
+            {
+                matchLabel->setString("Error!");
+            }
             break;
-        case 3:
+        case 2:
             //匹配完成，开始游戏
             send(client, "ready", sizeof("ready"), 0);
             match->setEnabled(false);
@@ -104,11 +111,10 @@ void Matching::update(float dt)
     {
         matchLabel->setString("Matched! Push the button to start.");
         //设置为start按钮
-        match->setEnabled(true);
-        match->setString("strat");
-        match->setTag(3);
+        start->setEnabled(true);
+        start->setTag(2);
     }
-    if (str == "start")
+    else if (str == "start")
     {
         matchLabel->setString("???????");
         Start();
