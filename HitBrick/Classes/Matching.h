@@ -8,7 +8,7 @@
 #include <WINSOCK2.H>
 #pragma comment(lib,"ws2_32.lib")
 
-//typedef int	socklen_t;
+typedef int	socklen_t;
 
 
 
@@ -29,9 +29,12 @@ public:
     void Start();
     cocos2d::Label* matchLabel;
 
+
+    sockaddr_in serveraddr;
+
     Menu* menu;
     MenuItemFont* match;
-    MenuItemFont* start;
+    MenuItemFont* back;
 
     char dataRecv[128];
     std::string str="";
