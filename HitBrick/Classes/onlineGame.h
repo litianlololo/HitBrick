@@ -22,6 +22,7 @@ public:
 	static cocos2d::Scene* createScene();
 
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> keyMap;
+	std::map<int,int> BrickPath;
 
 	Label* label;
 
@@ -76,8 +77,10 @@ public:
 	//Tag
 	int tagboard = 0;
 	int tagball = 1;
-	int tagbrick = 2;
-	int tag2xbrick = 3;
+	int tagbrickstart1 =100;
+	int tagbrickstart2 = 200;
+	int tagbrickstop1 = 100;
+	int tagbrickstop2 = 200;
 	int tagslowbrick = 4;
 	int tagcrazybrick = 5;
 	int tagstaticbrick = 6;
@@ -92,7 +95,6 @@ public:
 	int Gametime = 0;                   //游戏开始时间
 	int perscore = 1;                 //击碎每块砖加的score
 
-	std::vector<Vec2> Brickpath;
 	std::string strscore;
 	std::string strtime;
 	std::string strscore2;
@@ -106,10 +108,8 @@ public:
 	/// <summary>
 	/// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// </summary>
-	void addball2();
-	void addboard2();
-	void DataSend();
-	void DataRecv();
+	void addboardball2();
+	void DataT(float dt);
 	std::string DataCMP(int value);    //数据压缩打包成string
 	cocos2d::TMXTiledMap* map2;
 	Sprite* ball2;

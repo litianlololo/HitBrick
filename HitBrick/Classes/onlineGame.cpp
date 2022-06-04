@@ -3,11 +3,11 @@
 #include "store.h"
 #include "Gamemenu2.h"
 #include"Matching.h"
-
+#include<map>
 extern SOCKET client;
 extern std::string IPAddr;
 USING_NS_CC;
-
+void changemap(std::map<int, int>& mymap, int key, int value);
 Scene* onlineGame::createScene() {
 
     auto scene = Scene::createWithPhysics();
@@ -55,16 +55,16 @@ bool onlineGame::init()
     addmap();
     //添加板
     addBoard();
-    addboard2();
     //添加球
     addball();
-    addball2();
+    //添加对手
+    addboardball2();
     //添加Wall
     addWall();
     //添加砖块
     addBricks();
     //添加2x砖块
-    add2xbricks();
+   // add2xbricks();
     //添加暂停按钮
     addbutton();
     //添加分数
@@ -79,6 +79,8 @@ bool onlineGame::init()
     scheduleUpdate();
 
     schedule(SEL_SCHEDULE(&onlineGame::timer), 1.0f);
+    schedule((SEL_SCHEDULE(&onlineGame::DataT)), 0.5f);
+    //schedule((SEL_SCHEDULE(&onlineGame::DataRecv)), 0.2f);
     return true;
 }
 
@@ -128,11 +130,11 @@ void onlineGame::addBoard()
 
     return;
 }
-void onlineGame::addboard2()
+void onlineGame::addboardball2()
 {
     //添加板的刚体属性    
     board2 = Sprite::create("board/board.png");
-    board2->setAnchorPoint(Vec2(0, 0.5f));
+    board2->setAnchorPoint(Vec2(0.5, 0.5f));
     board2->setPosition(Vec2(board2->getContentSize().width / 2, origin.y + board2->getContentSize().height / 2));
 
     board2->setTag(tagboard2);           //供键盘监听器定位
@@ -148,9 +150,31 @@ void onlineGame::addboard2()
     board2->setPhysicsBody(BoardBody2);
 
     board2->getPhysicsBody()->setRotationEnable(false);   //设定球不旋转
-
-
     this->addChild(board2);
+
+
+
+    /////////////////////////////////////////////////////////////////
+    ball2 = Sprite::create("ball/ball.png");
+    ball2->setScale(2.0f, 2.0f);
+    ball2->setAnchorPoint(Vec2(0.5f, 0.5f));
+    ball2->setPosition(Vec2(40, 30));
+        //Vec2(visibleSize.width / 2 + origin.x + 50 + board2->getContentSize().width / 2 - map->getPositionX() + 30
+        //, origin.y + board2->getContentSize().height + 10 - map->getPositionX()));
+
+    // 设置球的刚体属性
+    auto ballBody2 = PhysicsBody::createCircle(ball2->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+    ballBody2->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+    ballBody2->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+    ballBody2->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+    ballBody2->setGravityEnable(false);                    //不受重力影响
+
+    ballBody2->setRotationEnable(false);                  //设定球不旋转
+
+    ball2->setPhysicsBody(ballBody2);
+    ball2->setTag(tagball2);
+    addChild(ball2);
 }
 
 void onlineGame::addball()
@@ -175,26 +199,6 @@ void onlineGame::addball()
     addChild(ball);
 }
 
-void onlineGame::addball2() {
-    ball2 = Sprite::create("ball/ball.png");
-    ball2->setScale(2.0f, 2.0f);
-    ball2->setAnchorPoint(Vec2(0.5f, 0.5f));
-    ball2->setPosition(Vec2(28 + board2->getContentSize().width / 2, origin.y + board2->getContentSize().height - 3));
-
-    // 设置球的刚体属性
-    auto ballBody2 = PhysicsBody::createCircle(ball->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
-
-    ballBody2->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
-    ballBody2->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
-    ballBody2->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
-    ballBody2->setGravityEnable(false);                    //不受重力影响
-
-    ballBody2->setRotationEnable(false);                  //设定球不旋转
-
-    ball2->setPhysicsBody(ballBody2);
-    ball2->setTag(tagball2);
-    addChild(ball2);
-}
 void onlineGame::addmap()
 {
     map = cocos2d::TMXTiledMap::create("onlinemap.tmx");
@@ -226,7 +230,7 @@ void onlineGame::addWall()
     //边界Size
     Size WallSize = Size(right - left, over - bottom);
 
-    auto WallBody = PhysicsBody::createEdgeBox(WallSize, PhysicsMaterial(0.0f, 1.0f, 0.0f), 1.0f);  //Wall的刚体属性  无密度 完全弹性碰撞 无摩擦力  第三个参数是边框的宽度
+    auto WallBody = PhysicsBody::createEdgeBox(WallSize, PhysicsMaterial(0.0f, 1.0f, 0.0f), 2.0f);  //Wall的刚体属性  无密度 完全弹性碰撞 无摩擦力  第三个参数是边框的宽度
 
     Wall = Sprite::create();
     Wall->setAnchorPoint(Vec2(0, 0));
@@ -335,7 +339,7 @@ void onlineGame::addscore()
 {
     auto label = Label::createWithTTF("score", "fonts/Marker Felt.ttf", 24);
     label->setPosition(Vec2(300, visibleSize.height - 20));
-    this->addChild(label);
+    //this->addChild(label);
 
     strscore = StringUtils::format("%d", score);
     scorelabel = Label::createWithTTF(strscore, "fonts/Marker Felt.ttf", 24);
@@ -434,8 +438,8 @@ void onlineGame::update(float delta) {
     auto movebyboard = MoveBy::create(0.2f, Vec2(offsetx, 0));
     board->runAction(movebyboard);
 
-    DataSend();
-    DataRecv();
+    //DataSend();
+    //DataRecv();
 
     return;
 }
@@ -444,7 +448,7 @@ void onlineGame::addBricks()
 {
     TMXObjectGroup* objectGroup = map->getObjectGroup("bricks");
     ValueVector values = objectGroup->getObjects();
-
+    int brick1 = 0;
     for (Value value : values)//遍历所有对象
     {
         ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
@@ -473,15 +477,17 @@ void onlineGame::addBricks()
         it->setPhysicsBody(BrickBody);
 
         this->addChild(it);
-        it->setTag(tagbrick);
-
+        it->setTag(tagbrickstart1+brick1);
+        BrickPath.insert(std::make_pair(tagbrickstart1 + brick1, 1));//将路径点保存到路径中  
+        brick1++;
         bricksnum++;
-        Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
     }
+    tagbrickstop1 += brick1;
 
+    //
     TMXObjectGroup* objectGroup2 = map2->getObjectGroup("bricks");
     ValueVector values2 = objectGroup2->getObjects();
-
+    int brick2 = 0;
     for (Value value2 : values2)//遍历所有对象
     {
         ValueMap valueMap2 = value2.asValueMap();//获得属性值：Value转换成ValueMap
@@ -510,50 +516,12 @@ void onlineGame::addBricks()
         it->setPhysicsBody(BrickBody2);
 
         this->addChild(it);
-        it->setTag(tagbrick);
-
-        Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
+        it->setTag(tagbrickstart2+brick2);
+        BrickPath.insert(std::make_pair(tagbrickstart2 + brick2, 1));//将路径点保存到路径中  
+        brick2++;
     }
+    tagbrickstop2 += brick2;
 }
-
-void onlineGame::add2xbricks() {
-    TMXObjectGroup* objectGroup = map->getObjectGroup("2xbrick");
-    ValueVector values = objectGroup->getObjects();
-
-    for (Value value : values)//遍历所有对象
-    {
-        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
-        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
-        float y = valueMap["y"].asFloat();
-
-        int type = valueMap["type"].asInt();
-        //添加砖块精灵
-        Sprite* it = Sprite::create("onlinegame/brick2x.png");
-        it->setAnchorPoint(Vec2(0, 0));
-        it->setPosition(264 + x, y);
-
-
-        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
-
-        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
-        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
-        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
-        BrickBody->setGravityEnable(false);                    //不受重力影响
-
-
-        BrickBody->setRotationEnable(false);                  //设定不旋转
-        BrickBody->setDynamic(false);
-        it->setPhysicsBody(BrickBody);
-
-
-        addChild(it);
-        it->setTag(tag2xbrick);
-
-        bricksnum++;
-        // Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
-    }
-}
-
 void onlineGame::onKeyPressed(EventKeyboard::KeyCode keycode, Event* event)
 {
     //键盘按下
@@ -593,18 +561,23 @@ bool onlineGame::onConcactBegin(PhysicsContact& contact) {
     //运动方向
     float angle = ball->getPhysicsBody()->getRotation() * 2 / 360 * 3.1415f;
     Vec2 dir = dir = Vec2(sin(angle), cos(angle));
-    if (nodeA->getTag() == tagbrick && nodeB->getTag() == tagball) {
+    
+    if (nodeA->getTag() >= tagbrickstart1 && nodeA->getTag() <= tagbrickstop1 && nodeB->getTag() == tagball) {
+        //路径中设置为删除
+        changemap(BrickPath, nodeA->getTag(),0);
         removeChild(nodeA);
         bricksnum--;
         score += perscore;
-
+        
         ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
 
         //更新score
         strscore = StringUtils::format("%d", score);
         scorelabel->setString(strscore);
     }
-    else if (nodeB->getTag() == tagbrick && nodeA->getTag() == tagball) {
+    else if (nodeB->getTag() >= tagbrickstart1  && nodeB->getTag() <= tagbrickstop1 && nodeA->getTag() == tagball) {
+        //路径中设置为删除 
+        changemap(BrickPath, nodeB->getTag(), 0);
         removeChild(nodeB);
         bricksnum--;
         score += perscore;
@@ -615,54 +588,11 @@ bool onlineGame::onConcactBegin(PhysicsContact& contact) {
 
         scorelabel->setString(strscore);
     }
-    else if (nodeA->getTag() == tagbrick && nodeB->getTag() == tagball2) {
+    else if (nodeA->getTag() >= tagbrickstart2 && nodeA->getTag() <= tagbrickstop2 && nodeB->getTag() == tagball2) {
         removeChild(nodeA);
-        //更新score
-        strscore2 = StringUtils::format("%d", score2);
-        scorelabel2->setString(strscore2);
     }
-    else if (nodeB->getTag() == tagbrick && nodeA->getTag() == tagball2) {
+    else if (nodeB->getTag() >= tagbrickstart2 && nodeB->getTag() <= tagbrickstop2 && nodeA->getTag() == tagball2) {
         removeChild(nodeB);
-        //更新score
-        strscore2 = StringUtils::format("%d", score2);
-        scorelabel2->setString(strscore2);
-    }
-    //2xbrick
-    else if (nodeA->getTag() == tag2xbrick && nodeB->getTag() == tagball) {
-        removeChild(nodeA);
-        bricksnum--;
-        perscore = 2;
-        score += perscore;
-
-        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
-
-        //更新score
-        strscore = StringUtils::format("%d", score);
-        scorelabel->setString(strscore);
-    }
-    else if (nodeB->getTag() == tag2xbrick && nodeA->getTag() == tagball) {
-        removeChild(nodeB);
-        bricksnum--;
-        perscore = 2;
-        score += perscore;
-
-        ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
-        //更新score
-        strscore = StringUtils::format("%d", score);
-
-        scorelabel->setString(strscore);
-    }
-    else if (nodeA->getTag() == tag2xbrick && nodeB->getTag() == tagball2) {
-        removeChild(nodeA);
-        //更新score
-        strscore2 = StringUtils::format("%d", score2);
-        scorelabel2->setString(strscore2);
-    }
-    else if (nodeB->getTag() == tag2xbrick && nodeA->getTag() == tagball2) {
-        removeChild(nodeB);
-        //更新score
-        strscore2 = StringUtils::format("%d", score2);
-        scorelabel2->setString(strscore2);
     }
     if (bricksnum == 0)
     {
@@ -672,28 +602,114 @@ bool onlineGame::onConcactBegin(PhysicsContact& contact) {
     return true;
 }
 
-void onlineGame::DataSend()
+void onlineGame::DataT(float dt)
 {
+    //send
     std::string dataSend = "";
     //与map左下角的相对位置
     dataSend += DataCMP(static_cast<int>(board->getPositionX() - map->getPositionX()));
-    dataSend += DataCMP(static_cast<int>(board->getPositionY() - map->getPositionY()));
-    dataSend += DataCMP(static_cast<int>(ball->getPositionX() - map->getPositionX()));
-    dataSend += DataCMP(static_cast<int>(ball->getPositionY() - map->getPositionY()));
-
+    dataSend += " " + DataCMP(static_cast<int>(board->getPositionY() - map->getPositionY()));
+    dataSend += " " + DataCMP(static_cast<int>(ball->getPositionX() - map->getPositionX()));
+    dataSend += " " + DataCMP(static_cast<int>(ball->getPositionY() - map->getPositionY()));
+    /*
+    std::map<int,int>::iterator iter;
+    for (iter = BrickPath.begin(); iter != BrickPath.end(); iter++)
+    {
+        if (iter->second == 0) {
+            dataSend += "*";
+            dataSend += DataCMP(iter->first);
+        }
+        BrickPath.erase(iter);
+    }
+    */
+    bool ifhit = 0;
+    for (std::pair<int,int> val : BrickPath)
+    {
+        if (val.second == 0) {
+            dataSend += " ";
+            dataSend += DataCMP(val.first);
+            ifhit = 1;
+        }
+        int key = val.first;
+        BrickPath.erase(key);
+    }
+    if (ifhit) {
+        dataSend += " ";
+        dataSend += "!";
+    }
     send(client, dataSend.c_str(), dataSend.size(), 0);
-}
-void onlineGame::DataRecv()
-{
+
+    //Recv
     char dataRecv[128];
     //与map左下角的相对位置
-    recv(client, dataRecv, 128, 0);
+    int ret = recv(client, dataRecv, 127, 0);
+    if (ret == -1) {
+        return;
+    }
+    int i = 1;
+    int boardX = 0;
+    int boardY = 0;
+    int ballX = 0;
+    int ballY = 0;
+    while (1) {
+        if (dataRecv[i] == '#') {
+            i++;
+            break;
+        }
+        boardX = boardX * 10 + static_cast<int>(dataRecv[i]-'0');
+        i++;
+    }
+    while (1) {
+        if (dataRecv[i] == '#') {
+            i++;
+            break;
+        }
+        boardY = boardY * 10 + static_cast<int>(dataRecv[i] - '0');
+        i++;
+    }
+
+    while (1) {
+        if (dataRecv[i] == '#') {
+            i++;
+            break;
+        }
+        ballX = ballX * 10 + static_cast<int>(dataRecv[i] - '0');
+        i++;
+    }
+    while (1) {
+        if (dataRecv[i] == '#') {
+            i++;
+            break;
+        }
+        ballY = ballY * 10 + static_cast<int>(dataRecv[i] - '0');
+        i++;
+    }
+    ////////
+    
+    if (dataRecv[i] == '*') {
+        i++;
+        while (1) {
+            if (dataRecv[i] = '!')
+                break;
+            int deletetag = 0;
+            while (1) {
+                if (dataRecv[i] == '*') {
+                    removeChildByTag(deletetag + 100);
+                    i++;
+                }
+                deletetag = deletetag * 10 + static_cast<int>(dataRecv[i] - '0');
+                i++;
+            }
+        }
+    }
+    ball2->setPosition(Vec2(30 + ballX, 0 + ballY));
+    board2->setPosition(Vec2(30 + boardX, 0 + boardY));
 }
 
 std::string onlineGame::DataCMP(int value)
 {
-    char buff[8];
-    snprintf(buff, sizeof(buff), "%8d", value);
+    char buff[8]={0};
+    snprintf(buff, sizeof(buff), "%d", value);
     return buff;
 }
 void onlineGame::setJoint()
@@ -736,4 +752,10 @@ void onlineGame::timer(float dt) {
     Gametime += 1;
     strtime = StringUtils::format("%d s", Gametime);
     timelabel->setString(strtime);
+}
+
+void changemap(std::map<int, int>&mymap, int key, int value)
+{
+    mymap[key] = value;
+    return;
 }

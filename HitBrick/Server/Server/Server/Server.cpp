@@ -15,16 +15,26 @@ string ipaddr="192.168.1.102";
 int main()
 {
     //定义发送缓冲区和接受缓冲区
-    char sendBuffer[128]={0};
+    char sendBuffer[128] = { 0 };
     char recvBufferA[128] = { 0 };
     char recvBufferB[128] = { 0 };
 
     WORD wVersionRequested;
     WSADATA wsaData;
+    
+    //服务端地址
+    SOCKADDR_IN addrSrv;
+    //客户端地址
+    SOCKADDR_IN addrClient;
+    //客户端地址集合
+    map<SOCKET, sockaddr_in>addrplayers;
+    addrSrv.sin_addr.S_un.S_addr = inet_addr(ipaddr.c_str());
+    addrSrv.sin_family = AF_INET;
+    addrSrv.sin_port = htons(10000);
+
+    wVersionRequested = MAKEWORD(2, 2);
+
     int err;
-
-    wVersionRequested = MAKEWORD(2, 2);//
-
     err = WSAStartup(wVersionRequested, &wsaData);
     if (err != 0)
     {
@@ -37,19 +47,8 @@ int main()
         return 0;
     }
 
-    //服务端地址
-    SOCKADDR_IN addrSrv;
-    //客户端地址
-    SOCKADDR_IN addrClient;
-    //客户端地址集合
-    map<SOCKET, sockaddr_in>addrplayers;
-
     //用于检查可读取数据
     fd_set readfd;
-
-    addrSrv.sin_addr.S_un.S_addr = inet_addr(ipaddr.c_str());
-    addrSrv.sin_family = AF_INET;
-    addrSrv.sin_port = htons(10000);
 
     //创建套接字
     SOCKET server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -91,7 +90,7 @@ int main()
 
                 if (players.size() == playersnum)
                 {
-                    Sleep(300);
+                    Sleep(1000);
                     send(players[0], "matched", sizeof("matched"), 0);
                     send(players[1], "matched", sizeof("matched"), 0);
                     ifstart = 1;
@@ -117,11 +116,12 @@ int main()
             //处理数据
             if (ret > 0)
             {
+                cout << "<<<<<" << ret << ">>>>>>" << endl;
                 //欲退出的套接字
                 vector<SOCKET> deleteplayers;
                 //正式游戏阶段
                 //接收A客户端信息
-                //Sleep(1000);
+               // Sleep(1000);
                 int recvLengthA = recv(players[0], recvBufferA, 128, 0);          //接收信息
                 string MsgA = string(recvBufferA);           //读取的信息存入Msg
                 if (recvLengthA < 0)  //无新信息
@@ -150,11 +150,12 @@ int main()
                     else if (ifstart) {
                         //发送给B玩家 运动信息
                         int ret1 = send(players[1], MsgA.c_str(), MsgA.size(), 0);
-                        Sleep(1000);
+                        cout << "sendtoB"<< MsgA.c_str() <<endl;
+                        //Sleep(1000);
                     }
                 }
                 //接收B客户端信息
-                //Sleep(1000);
+               // Sleep(1000);
                 int recvLengthB = recv(players[1], recvBufferB, 128, 0);          //接收信息
                 string MsgB = string(recvBufferB);           //读取的信息存入Msg
                 if (recvLengthB < 0)  //无新信息
@@ -183,7 +184,8 @@ int main()
                     else if (ifstart) {
                         //发送给A玩家 运动信息
                         int ret2 = send(players[0], MsgB.c_str(), MsgB.size(), 0);
-                        Sleep(1000);
+                        cout << "sendtoA" << MsgB.c_str() << endl;
+                        //Sleep(1000);
 
                     }
 
