@@ -53,6 +53,10 @@ public:
 	void update(float dt);     //用于处理board移动 和小球蓄力
 
 	void Gameover();
+	void Gamewin();
+	void Winsend(float dt);
+	void unSchedule(float dt);
+
 	void pauseClickCallBack(Ref* pSender);
 
 	void backGamemenu(float dt);
@@ -123,6 +127,10 @@ public:
 
 	//onlineGame
 	int state = 0;    //游戏进行状态
+	bool ifout = 1;
+	std::string dataSend = "";
+	char dataRecv[128];
+	
 
 private:
 	PhysicsWorld* HitBrick_world;                       //带物理引擎的世界  HitBrick_world
