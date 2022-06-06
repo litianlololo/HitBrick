@@ -10,10 +10,17 @@
 
 using namespace std;
 const int playersnum = 2;
-string ipaddr="192.168.1.104";
-
+string ipaddr="192.168.1.102";
+int i;
 int main()
 {
+    cout << "请选择是否输入IP 1是 0否（默认192.168.1.102）" << endl;
+    cin >> i;
+    if (i == 1) {
+        cout << "请输入IP地址（默认192.168.1.102）" << endl;
+        cin >> ipaddr;
+    }
+    cout << "ready"<<endl;
     while (1) {
         //定义发送缓冲区和接受缓冲区
         char sendBuffer[128] = { 0 };

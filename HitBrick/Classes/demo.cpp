@@ -339,6 +339,7 @@ void HitBrick::update(float delta) {
     auto s = EventKeyboard::KeyCode::KEY_S;
     auto a = EventKeyboard::KeyCode::KEY_A;
     auto d = EventKeyboard::KeyCode::KEY_D;
+    auto p = EventKeyboard::KeyCode::KEY_P;
     int offsetx = 0;
     int offsety = 0;
 
@@ -390,6 +391,17 @@ void HitBrick::update(float delta) {
     if (keyMap[s] && ifs)
     {
         offsety = -1 * speed;
+    }
+    if (keyMap[p]) {
+        ifstart = 0;
+        score -= 1;
+        removeChild(board);
+        removeChild(ball);
+        addBoard();
+        addball();
+        setJoint();
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
     }
 
     if (offsetx == 0 && offsety == 0 && !keyMap[EventKeyboard::KeyCode::KEY_SPACE])

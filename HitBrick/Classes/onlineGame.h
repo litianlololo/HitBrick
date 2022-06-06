@@ -93,7 +93,7 @@ public:
 	int Gamechoice = 0;           //游戏关卡
 	int score = 0;                //积分
 	int ifstart = 0;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
-	int startF=200;                   //赋予小球的动量
+	int startF=180;                   //赋予小球的动量
 	int bricksnum = 0;            //剩余砖块数
 	int speed = 6;                 //board speed
 	int Gametime = 0;                   //游戏开始时间
@@ -114,7 +114,9 @@ public:
 	/// </summary>
 	void addboardball2();
 	void DataT(float dt);
+	void BrickT();
 	std::string DataCMP(int value);    //数据压缩打包成string
+	std::string BrickCMP(int value);    //数字压缩打包成string
 	cocos2d::TMXTiledMap* map2;
 	Sprite* ball2;
 	Sprite* board2;
@@ -124,13 +126,13 @@ public:
 	int score2 = 0;
 	int tagboard2 = 10;
 	int tagball2 = 11;
-
+	bool ifhit = 0;
 	//onlineGame
 	int state = 0;    //游戏进行状态
 	bool ifout = 1;
 	std::string dataSend = "";
 	char dataRecv[128];
-	
+	int sendcont = 0;
 
 private:
 	PhysicsWorld* HitBrick_world;                       //带物理引擎的世界  HitBrick_world
