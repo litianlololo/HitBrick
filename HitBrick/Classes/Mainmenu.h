@@ -13,9 +13,7 @@ public:
 
 	void menuClickCallBack(Ref* sender);
     void menuGoToHelloworld(Ref* pSender);
-	
-	//void update(float delta);
-
+	void addBackGround();
 	Size visibleSize;
 	Vec2 origin;
 

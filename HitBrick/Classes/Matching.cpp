@@ -31,15 +31,47 @@ bool Matching::init()
     menu = Menu::create(match,back, NULL);
     menu->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2);
     addChild(menu);
+    menu->setColor(Color3B::BLACK);
     menu->alignItemsVertically();
-
    
+    getIP = ui::TextField::create();
+    getIP->setMaxLength(30);
+    getIP->setColor(Color3B::WHITE);
+    getIP->setFontSize(24);
+    getIP->setFontName("fonts/Marker Felt.ttf");
+    getIP->setString(IPAddr);
+
+    getIP->setPosition(Vec2(visibleSize.width / 2+origin.x, visibleSize.height / 2 + 85));
+    this->addChild(getIP);
+
+    auto IPLabel = Label::createWithTTF("IP Address", "fonts/Marker Felt.ttf",24);
+    IPLabel->setPosition(Vec2(visibleSize.width / 2+origin.x, visibleSize.height / 2 + 55));
+    //IPLabel->setColor(Color3B::WHITE);
+    this->addChild(IPLabel);
+   
+    //添加背景
+    addBackGround();
 
     scheduleUpdate();
     return true;
 }
 
+void Matching::addBackGround()
+{
+    //实现背景图片铺满整个窗口
+    auto bg = Sprite::create("Mainback.png");
+    bg->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y);
+    Size mywinsize = Director::getInstance()->getWinSize();
+    float winw = mywinsize.width; //获取屏幕宽度
+    float winh = mywinsize.height;//获取屏幕高度
+    float spx = bg->getTextureRect().getMaxX();
+    float spy = bg->getTextureRect().getMaxY();
+    bg->setScaleX(winw / spx); //设置精灵宽度缩放比例
+    bg->setScaleY(winh / spy);
+    this->addChild(bg, -3);
 
+    return;
+}
 void Matching::menuClickCallBack(Ref* sender)
 {
     Node* node = dynamic_cast<Node*>(sender);
@@ -59,6 +91,7 @@ void Matching::menuClickCallBack(Ref* sender)
             break;
         case 1:
             //客户端
+            IPAddr = getIP->getString();
             WSADATA wsaData;
             WSAStartup(MAKEWORD(2, 2), &wsaData);
 

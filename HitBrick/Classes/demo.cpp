@@ -2,7 +2,7 @@
 #include "demo.h"
 #include "store.h"
 #include "Gamemenu.h"
-//#include "Gamemenu.cpp"
+#include "AudioEngine.h"
 
 USING_NS_CC;
 
@@ -71,6 +71,8 @@ bool HitBrick::init()
     addKeyListener();
     //添加碰撞监听器
     addcontactListener();
+
+    addkuang();
 
     scheduleUpdate();
 
@@ -330,7 +332,6 @@ void HitBrick::addcontactListener()
     return;
 }
 
-
 void HitBrick::update(float delta) {
     Node* board = this->getChildByTag(tagboard);
     //Node* ball  = this->getChildByTag(tagball);                    ???为什么ball 和 board 同时动会报错？？？
@@ -397,11 +398,21 @@ void HitBrick::update(float delta) {
     board->runAction(movebyboard);
 
     //SPACE  ball蓄力
-    if (ifstart==1 && startF<=100) {
-        startF++;
+    if (ifstart==1 && startF<=150) {
+        startF+=1;
+        kuang->setColor(Color3B(220 * startF / 150, 255 - 235 * startF / 150, 255 - 195 * startF / 150));
     }
-
+    
     return;
+}
+
+void HitBrick::addkuang() {
+    kuang = Sprite::create("kuang.png");
+    kuang->setAnchorPoint(Vec2(0, 0));
+    kuang->setPosition(Vec2(30,10));
+    kuang->setColor(Color3B::GREEN);
+    kuang->setTag(tagkuang);           //供键盘监听器定位
+    addChild(kuang);
 }
 
 void HitBrick::addBricks()
@@ -609,8 +620,11 @@ void HitBrick::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
             ifstart = -1;          //小球不再蓄力
             HitBrick_world->removeJoint(joint);
             ball->getPhysicsBody()->setVelocity(Vec2(0, startF*4));
+            AudioEngine::play2d("biu.mp3", false, 1.0);
+            removeChild(kuang);
         }
     }
+  
     return;
 }
 
@@ -743,24 +757,6 @@ bool HitBrick::onConcactBegin(PhysicsContact& contact) {
     return true;
 }
 
-/*
-bool HitBrick::TouchBegan(cocos2d::Touch* pTouch, Event* pEvent)
-{
-    point = this->tilePosFromLocation(pTouch->getLocation(), (TMXTiledMap*)this->getChildByTag(1));
-    return true;
-}
-
-Point HitBrick::tilePosFromLocation(Point location, TMXTiledMap* tileMap)
-{
-    //pos是地图上的坐标，当前屏幕的坐标+地图的偏移量
-    Point pos =Vec2(location, tileMap->getPosition());
-    pos.x = (int)(pos.x / tileMap->getTileSize().width);
-    //（地图总块数*每块的像素 - 现在的y坐标）/ 每块的像素
-    //getMapSize().height是地图高度的瓷砖数
-    pos.y = (int)(((tileMap->getMapSize().height * tileMap->getTileSize().height - pos.y)) / tileMap->getTileSize().height);
-    return pos;
-}
-*/
 void HitBrick::setJoint() 
 {
     joint = PhysicsJointFixed::construct(ball->getPhysicsBody(), board->getPhysicsBody(),board->getAnchorPoint());
@@ -794,13 +790,16 @@ void HitBrick::Gameover()
             break;
         }
         UserDefault::getInstance()->flush();
-
+        AudioEngine::stopAll();
+        AudioEngine::play2d("win.mp3", false, 1.0);
         //延时两秒返回Gamemenu
-        schedule(SEL_SCHEDULE(&HitBrick::backGamemenu), 2.0f);
+        schedule(SEL_SCHEDULE(&HitBrick::backGamemenu), 5.0f);
     }
 }
 
 void HitBrick::backGamemenu(float dt) {
+    AudioEngine::stopAll();
+    AudioEngine::play2d("Game.mp3",true,1.0);
     auto Gamescene = Gamemenu::createScene();
     Director::getInstance()->replaceScene(Gamescene);
 }

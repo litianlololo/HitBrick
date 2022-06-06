@@ -2,7 +2,7 @@
 #include "SpeedGame.h"
 #include "store.h"
 #include "Gamemenu2.h"
-
+#include "AudioEngine.h"
 //#include "Gamemenu.cpp"
 
 USING_NS_CC;
@@ -636,6 +636,7 @@ void HitBrick2::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
             ifstart = -1;          //小球不再蓄力
             HitBrick_world->removeJoint(joint);
             ball->getPhysicsBody()->setVelocity(Vec2(0, startF * 4));
+            AudioEngine::play2d("biu.mp3", false, 1.0);
         }
     }
     return;
@@ -787,12 +788,16 @@ void HitBrick2::Gameover()
     if (bricksnum == 0) {
         //输出success
         auto label1 = Label::createWithTTF("Success!", "fonts/Marker Felt.ttf", 60);
+        AudioEngine::stopAll();
+        AudioEngine::play2d("win.mp3", true, 1.0);
         label1->setColor(Color3B(0, 0, 0));
         label1->setPosition(visibleSize.width / 2 + origin.x + 28, visibleSize.height / 2);
         this->addChild(label1, 1);
     }
     else {
         auto lab = Label::createWithTTF("DEFEAT!", "fonts/Marker Felt.ttf", 60);
+        AudioEngine::stopAll();
+        AudioEngine::play2d("defeat.mp3", true, 0.5);
         lab->setColor(Color3B(0, 0, 0));
         lab->setPosition(visibleSize.width / 2 + origin.x + 28, visibleSize.height / 2);
         this->addChild(lab, 1);
@@ -802,7 +807,7 @@ void HitBrick2::Gameover()
     UserDefault::getInstance()->flush();
 
     //延时两秒返回Gamemenu
-    schedule(SEL_SCHEDULE(&HitBrick2::backGamemenu), 2.0f);
+    schedule(SEL_SCHEDULE(&HitBrick2::backGamemenu), 5.0f);
 }
 //排行榜结算
 void HitBrick2::settlement()
@@ -951,6 +956,8 @@ void HitBrick2::settlement()
 }
 
 void HitBrick2::backGamemenu(float dt) {
+    AudioEngine::stopAll();
+    AudioEngine::play2d("Gamemusic.mp3", true, 1.0);
     auto Gamescene = Gamemenu2::createScene();
     Director::getInstance()->replaceScene(Gamescene);
 }

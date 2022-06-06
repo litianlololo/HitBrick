@@ -10,7 +10,7 @@
 
 using namespace std;
 const int playersnum = 2;
-string ipaddr="192.168.1.10                                              2";
+string ipaddr="192.168.1.104";
 
 int main()
 {

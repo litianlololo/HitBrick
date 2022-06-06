@@ -17,7 +17,7 @@ public:
 
 	void menuClickCallBack(Ref* sender);
 	//void menuGoToHelloworld(Ref* pSender);
-
+	void addBackGround();
 	void update(float delta);
 	void Game();
 	int Gamechoice = 0;

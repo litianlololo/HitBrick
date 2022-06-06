@@ -19,7 +19,7 @@ public:
 	void getscore();
 	void gettime();
 	void update(float delta);
-
+	void addBackGround();
 	int gamechoice = 0;
 	int model = 0;
 	Size visibleSize;

@@ -32,12 +32,28 @@ bool DESCRIPTION::init()
     back->setTag(0);
     auto menu = Menu::create(back, NULL);
     menu->setPosition(visibleSize.width / 2 + origin.x, 30);
+    menu->setColor(Color3B::BLACK);
     addChild(menu);
-
+    addBackGround();
     scheduleUpdate();
     return true;
 }
+void DESCRIPTION::addBackGround()
+{
+    //实现背景图片铺满整个窗口
+    auto bg = Sprite::create("Mainback.png");
+    bg->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y);
+    Size mywinsize = Director::getInstance()->getWinSize();
+    float winw = mywinsize.width; //获取屏幕宽度
+    float winh = mywinsize.height;//获取屏幕高度
+    float spx = bg->getTextureRect().getMaxX();
+    float spy = bg->getTextureRect().getMaxY();
+    bg->setScaleX(winw / spx); //设置精灵宽度缩放比例
+    bg->setScaleY(winh / spy);
+    this->addChild(bg, -3);
 
+    return;
+}
 void DESCRIPTION::menuClickCallBack(Ref* sender)
 {
     Node* node = dynamic_cast<Node*>(sender);

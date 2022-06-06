@@ -1,10 +1,5 @@
 #include "cocos2d.h"
 #include "Gamemodel.h"
-#include "Gamemenu.h"
-#include "Gamemenu2.h"
-#include "Mainmenu.h"
-#include "demo.h"
-#include "Matching.h"
 
 USING_NS_CC;
 
@@ -42,13 +37,32 @@ bool Gamemodel::init()
     auto menu = Menu::create(game1, game2, game3 , back, NULL);
     menu->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2);
     addChild(menu);
+    menu->setColor(Color3B::BLACK);
     menu->alignItemsVertically();
+
+    addBackGround();
+
 
     scheduleUpdate();
     return true;
 }
 
+void Gamemodel::addBackGround()
+{
+    //实现背景图片铺满整个窗口
+    auto bg = Sprite::create("Mainback.png");
+    bg->setPosition(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y);
+    Size mywinsize = Director::getInstance()->getWinSize();
+    float winw = mywinsize.width; //获取屏幕宽度
+    float winh = mywinsize.height;//获取屏幕高度
+    float spx = bg->getTextureRect().getMaxX();
+    float spy = bg->getTextureRect().getMaxY();
+    bg->setScaleX(winw / spx); //设置精灵宽度缩放比例
+    bg->setScaleY(winh / spy);
+    this->addChild(bg, -3);
 
+    return;
+}
 void Gamemodel::menuClickCallBack(Ref* sender)
 {
     Node* node = dynamic_cast<Node*>(sender);

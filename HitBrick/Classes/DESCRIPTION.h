@@ -15,7 +15,7 @@ public:
 	virtual bool init();
 
 	void menuClickCallBack(Ref* sender);
-
+	void addBackGround();
 	Size visibleSize;
 	Vec2 origin;
 

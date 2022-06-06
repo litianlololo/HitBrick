@@ -27,6 +27,7 @@ public:
     void menuClickCallBack(Ref* sender);
     void Matched();
     void Start();
+    void addBackGround();
     cocos2d::Label* matchLabel;
 
 
@@ -35,7 +36,7 @@ public:
     Menu* menu;
     MenuItemFont* match;
     MenuItemFont* back;
-
+    cocos2d::ui::TextField* getIP;
     char dataRecv[128];
     std::string str="";
     CREATE_FUNC(Matching);

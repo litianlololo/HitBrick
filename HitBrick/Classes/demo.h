@@ -41,7 +41,7 @@ public:
 	void addhscore();    //添加最高分
 
 	void addbutton();
-
+	void addkuang();
 	void onKeyPressed(EventKeyboard::KeyCode code, Event* event);      //用于ball蓄力判断
 	void onKeyReleased(EventKeyboard::KeyCode code, Event* event);     //
 	bool onConcactBegin(PhysicsContact& contact);
@@ -59,6 +59,7 @@ public:
 	PhysicsJointFixed* joint;
     
 	Sprite* ball;
+	Sprite* kuang;
 	Sprite* board;
 	Sprite* Wall;                  //边界，ball碰到会反弹
 	Sprite* pausebg;               //暂停背景
@@ -74,6 +75,7 @@ public:
 	int tagslowbrick = 4;
 	int tagcrazybrick = 5;
 	int tagstaticbrick = 6;
+	int tagkuang = 7;
 	int Gamechoice = 0;           //游戏关卡
 	int score=0;
 	int ifstart = 0;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
@@ -81,7 +83,6 @@ public:
 	int bricksnum = 0;            //剩余砖块数
 	int perscore = 1;                 //击碎每块砖加的score
 	int ballspeedup = 250;        //小球加速增益
-
 
 	std::string strscore;
 

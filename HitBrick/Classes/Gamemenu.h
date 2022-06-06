@@ -19,6 +19,7 @@ public:
 
 	void update(float delta);
 	void Game();
+	void addBackGround();
 	int Gamechoice = 0;
 	Size visibleSize;
 	Vec2 origin;

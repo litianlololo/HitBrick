@@ -66,6 +66,11 @@ bool onlineGame::init()
     //Ìí¼ÓÅö×²¼àÌıÆ÷
     addcontactListener();
 
+    //Ìí¼Ó±³¾°ÒôÀÖ
+    AudioEngine::preload("Gamemusic.mp3");
+    AudioEngine::stopAll();
+    AudioEngine::play2d("Gamemusic.mp3", true, 1.0);
+
     scheduleUpdate();
 
     schedule(SEL_SCHEDULE(&onlineGame::timer), 1.0f);
