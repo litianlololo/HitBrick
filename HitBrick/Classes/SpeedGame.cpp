@@ -367,7 +367,15 @@ void HitBrick2::update(float delta) {
             removeChild(revivepng);
         }
     }
-
+    //Çò·Éµ½±ß½çÍâ
+    if (ball->getPositionY() >= 800 || ball->getPositionX() >= 1000 || ball->getPositionX() < 0) {
+        ifstart = 0;
+        removeChild(board);
+        removeChild(ball);
+        addBoard();
+        addball();
+        setJoint();
+    }
     Node* board = this->getChildByTag(tagboard);
    
     //Node* ball  = this->getChildByTag(tagball);                 

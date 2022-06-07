@@ -340,6 +340,15 @@ void HitBrick::addcontactListener()
 }
 
 void HitBrick::update(float delta) {
+    //球飞到边界外
+    if (ball->getPositionY() < 0 || ball->getPositionY() >= 800 || ball->getPositionX() >= 1000 || ball->getPositionX() < 0) {
+        ifstart = 0;
+        removeChild(board);
+        removeChild(ball);
+        addBoard();
+        addball();
+        setJoint();
+    }
     Node* board = this->getChildByTag(tagboard);
     //Node* ball  = this->getChildByTag(tagball);                    ???为什么ball 和 board 同时动会报错？？？
     auto w = EventKeyboard::KeyCode::KEY_W;
@@ -699,7 +708,7 @@ bool HitBrick::onConcactBegin(PhysicsContact& contact) {
     auto nodeB = contact.getShapeB()->getBody()->getNode();
     //运动方向
     float angle = ball->getPhysicsBody()->getRotation() * 2 / 360 * 3.1415f;
-    Vec2 dir = dir = Vec2(sin(angle), cos(angle));
+    Vec2 dir = Vec2(sin(angle), cos(angle));
     if (nodeA->getTag() == tagbrick && nodeB->getTag() == tagball) {
         removeChild(nodeA);
         bricksnum--;

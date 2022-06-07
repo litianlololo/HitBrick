@@ -19,7 +19,7 @@ bool DESCRIPTION::init()
     visibleSize = Director::getInstance()->getVisibleSize();                              //»ñÈ¡ÆÁÄ»×ø±ê
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
-    MenuItemFont::setFontSize(10);
+    MenuItemFont::setFontSize(6);
 
     auto url = FileUtils::getInstance()->getStringFromFile("description.txt");
     auto txt = Label::create();

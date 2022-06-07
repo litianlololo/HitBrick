@@ -105,8 +105,8 @@ void Matching::menuClickCallBack(Ref* sender)
 
             match->setEnabled(false);
 
-            matchLabel = Label::createWithTTF("connecting", "fonts/Marker Felt.ttf", 24);
-            matchLabel->setPosition(Vec2(visibleSize.width / 2 + origin.x, 100));
+            matchLabel = Label::createWithTTF("error", "fonts/Marker Felt.ttf", 24);
+            matchLabel->setPosition(Vec2(visibleSize.width / 2 + origin.x+30, 100));
             this->addChild(matchLabel);
 
             if (!connect(client, (sockaddr*)&serveraddr, sizeof(serveraddr)))
