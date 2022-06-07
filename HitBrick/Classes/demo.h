@@ -1,7 +1,7 @@
 #pragma once
 #ifndef __HITBRICK_H__
 #define __HITBRICK_H__
-
+#include "BoardBall.h"
 #include "cocos2d.h"
 
 USING_NS_CC;
@@ -33,6 +33,7 @@ public:
 	void addslowbricks(); //添加减速砖块
 	void addcrazybricks(); //添加疯狂砖块
 	void addstaticbricks(); //添加固定砖块
+	void addrevivebricks(); //
 
 	void addKeyListener(); // 添加键盘监听器
 	void addcontactListener(); //添加碰撞监听器
@@ -67,7 +68,7 @@ public:
 	Label* scorelabel;
 
 	//Tag
-	int speed = 6;                 //board speed
+              //board speed
 	int tagboard = 0;
 	int tagball = 1;
 	int tagbrick = 2;
@@ -75,18 +76,23 @@ public:
 	int tagslowbrick = 4;
 	int tagcrazybrick = 5;
 	int tagstaticbrick = 6;
-	int tagkuang = 7;
-	int Gamechoice = 0;           //游戏关卡
-	int score=0;
-	int ifstart = 0;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
+	int tagkuang = 7;	
+	
+	int speed;   
+	int Gamechoice;           //游戏关卡
+	int score;
+	int ifstart;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
 	int startF;                   //赋予小球的动量
-	int bricksnum = 0;            //剩余砖块数
-	int perscore = 1;                 //击碎每块砖加的score
-	int ballspeedup = 250;        //小球加速增益
-
+	int bricksnum;            //剩余砖块数
+	int perscore;                 //击碎每块砖加的score
+	int ballspeedup;        //小球加速增益
+	
 	std::string strscore;
 
 	std::vector<Vec2> Brickpath;
+
+	Board BD;
+	Ball BL;
 	//std::vector<Sprite*> Bricks;
 	//void updateShip(float dt);  // 更新船的平衡情况
 	//void BrickGeneraetd();  // 掉落箱子
@@ -113,18 +119,8 @@ public:
 	CREATE_FUNC(HitBrick);
 
 private:
+	HitBrick();
 	PhysicsWorld* HitBrick_world;                       //带物理引擎的世界  HitBrick_world
-
-	//Sprite* player;
-	//Sprite* ship;
-	//bool onBall;
-	//Sprite* ball;
-	// 固定关节
-	//PhysicsJointPin* joint1;
-	//int spHolded;
-	//int spFactor;
-	//新加了标签，分别代表了底部的船，球，砖块，玩家的板子
-	//enum Tag { SHIP, BALL, BOX, BOARD };
 };
 
 #endif // __HITBRICK_H__

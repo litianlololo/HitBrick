@@ -6,8 +6,10 @@
 #include "store.h"
 
 USING_NS_CC;
+Gamemenu::Gamemenu() :Gamechoice(0),visibleSize(Size(0,0)),origin(Vec2(0,0))
+{
 
-
+}
 Scene* Gamemenu::createScene()
 {
     auto scene = Scene::create();

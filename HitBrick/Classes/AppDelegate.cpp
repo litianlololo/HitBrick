@@ -93,8 +93,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
     //Ìí¼Ó±³¾°ÒôÀÖ
     AudioEngine::preload("menumusic.mp3");
     AudioEngine::play2d("menumusic.mp3", true, 1.0);
-    
-    
+    //³õÊ¼»¯Çò°å
+    UserDefault::getInstance()->setIntegerForKey("ballstyle", 0);//////////////////////////////////////////////////////////////////////////////////////////
+    UserDefault::getInstance()->setIntegerForKey("ballcolor", 4);
+    UserDefault::getInstance()->setIntegerForKey("boardstyle", 0);
+    UserDefault::getInstance()->setIntegerForKey("boardcolor", 4);
     // create a scene. it's an autorelease object
     auto scene = Mainmenu::createScene();
 

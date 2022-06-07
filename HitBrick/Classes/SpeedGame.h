@@ -3,13 +3,14 @@
 #define __HITBRICK2_H__
 
 #include "cocos2d.h"
-
+#include "BoardBall.h"
 USING_NS_CC;
 
 class HitBrick2 : public cocos2d::Layer {
 public:
 
 	cocos2d::TMXTiledMap* map;
+	HitBrick2();
 
 	virtual bool init();
 	static Scene* scene();
@@ -34,6 +35,7 @@ public:
 	void addslowbricks(); //添加减速砖块
 	void addcrazybricks(); //添加疯狂砖块
 	void addstaticbricks(); //添加固定砖块
+	void addrevivebricks(); //添加固定砖块
 
 	void addKeyListener(); // 添加键盘监听器
 	void addcontactListener(); //添加碰撞监听器
@@ -65,6 +67,7 @@ public:
 	Sprite* board;
 	Sprite* Wall;                  //边界，ball碰到会反弹
 	Sprite* pausebg;               //暂停背景
+	Sprite* revivepng;          //复活图标
 	Menu* pausemenu;            //暂停菜单
 	Label* scorelabel;
 	Label* timelabel;
@@ -77,16 +80,18 @@ public:
 	int tagslowbrick = 4;
 	int tagcrazybrick = 5;
 	int tagstaticbrick = 6;
+	int tagrevivebrick = 7;
 
-	int ballspeedup = 250;        //小球加速增益
-	int Gamechoice = 0;           //游戏关卡
-	int score = 0;                //积分
-	int ifstart = 0;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
+	int ballspeedup;        //小球加速增益
+	int Gamechoice;           //游戏关卡
+	int score;                //积分
+	int ifstart;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
 	int startF;                   //赋予小球的动量
-	int bricksnum = 0;            //剩余砖块数
-	int speed = 6;                 //board speed
-	int Gametime=0;                   //游戏开始时间
-	int perscore=1;                 //击碎每块砖加的score
+	int bricksnum;            //剩余砖块数
+	int speed;                 //board speed
+	int Gametime;                   //游戏开始时间
+	int perscore;                 //击碎每块砖加的score
+	int revivetimes = 0;      //复活次数
 
 	std::vector<Vec2> Brickpath;
 	std::string strscore;
@@ -96,6 +101,8 @@ public:
 	Size visibleSize;
 	Vec2 origin;
 
+	Ball BL;
+	Board BD;
 	CREATE_FUNC(HitBrick2);
 
 private:

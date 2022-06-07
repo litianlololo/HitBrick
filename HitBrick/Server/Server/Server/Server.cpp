@@ -187,59 +187,6 @@ int main()
 
                         }
                     }
-                    /*
-                    //cout << "2" << endl;
-                    for (pl = players.begin(); pl != players.end(); ++pl)
-                    {
-                        int recvLength = recv(players[0], recvBuffer, 128, 0);          //接收信息
-                        if (recvLength < 0)  //无新信息
-                        {
-                            newrecv = 0;
-                            //continue;
-                        }
-                        else {               //有新信息
-                            newrecv = 1;
-                            cout << "Client Message:" << recvBuffer << endl;
-                            string Msg = string(recvBuffer);           //读取的信息存入Msg
-                            if (Msg == "Quit")                         //有玩家退出
-                            {
-
-                                for (vector<SOCKET>::iterator pl2 = players.begin(); pl2 != players.end(); ++pl2) {    //向另一玩家发出退出信息
-                                    if (pl2 != pl) {
-                                        cout << "player quit" << endl;
-                                        strcpy(sendBuffer, "Quit");
-                                        send(*pl2, sendBuffer, 128, 0);
-                                    }
-                                }
-                                deleteplayers.push_back(*pl);
-                            }
-                            else if (Msg == "Win")                      //有玩家获胜
-                            {
-                                for (vector<SOCKET>::iterator pl2 = players.begin(); pl2 != players.end(); ++pl2) {    //向另一玩家发出退出信息
-                                    if (pl2 != pl) {
-                                        cout << "player win" << endl;
-                                        strcpy(sendBuffer, "Win");
-                                        send(*pl2, sendBuffer, 128, 0);
-                                    }
-                                }
-                                deleteplayers.push_back(*pl);
-                            }
-                            else if (Msg == "ready") {
-                                if (pl == players.begin())
-                                {
-                                    Astart = 1;
-                                }
-                                else {
-                                    Bstart = 1;
-                                }
-                            }
-                            //发送游戏信息
-                            /*
-                            for (vector<SOCKET>::iterator pl2 = players.begin(); pl2 != players.end(); ++pl2) {    //向另一玩家发出退出信息
-                                if (pl2 != pl) {
-                                    send(*pl2, recvBuffer, 128, 0);
-                                }
-                            }*/
                 }
             }
         }

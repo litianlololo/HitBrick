@@ -15,7 +15,7 @@ USING_NS_CC;
 class onlineGame : public cocos2d::Layer {
 public:
 
-	
+	onlineGame();
 
 	virtual bool init();
 	static Scene* scene();
@@ -89,15 +89,15 @@ public:
 	int tagcrazybrick = 5;
 	int tagstaticbrick = 6;
 
-	int ballspeedup = 250;        //小球加速增益
-	int Gamechoice = 0;           //游戏关卡
-	int score = 0;                //积分
-	int ifstart = 0;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
-	int startF=180;                   //赋予小球的动量
-	int bricksnum = 0;            //剩余砖块数
-	int speed = 6;                 //board speed
-	int Gametime = 0;                   //游戏开始时间
-	int perscore = 1;                 //击碎每块砖加的score
+	int ballspeedup;        //小球加速增益
+	int Gamechoice;           //游戏关卡
+	int score;                //积分
+	int ifstart;              //是否已经开始蓄力   0=未蓄力 1=正在蓄力  -1=已经发射
+	int startF;                   //赋予小球的动量
+	int bricksnum;            //剩余砖块数
+	int speed;                 //board speed
+	int Gametime;                   //游戏开始时间
+	int perscore;                 //击碎每块砖加的score
 
 	std::string strscore;
 	std::string strtime;

@@ -5,7 +5,7 @@
 #include "DESCRIPTION.h"
 #include "ui/CocosGUI.h"
 #include "AudioEngine.h"
-
+#include "setting.h"
 USING_NS_CC;
 
 Scene* Mainmenu::createScene()
@@ -24,11 +24,12 @@ bool Mainmenu::init()
     MenuItemFont::setFontSize(20);
     auto GAME = MenuItemFont::create("GAME", CC_CALLBACK_1(Mainmenu::menuClickCallBack, this));
     auto description = MenuItemFont::create("DESCRIPTION", CC_CALLBACK_1(Mainmenu::menuClickCallBack, this));
+    auto setting = MenuItemFont::create("SETTING", CC_CALLBACK_1(Mainmenu::menuClickCallBack, this));
     //MainmenuTag
     GAME->setTag(1);
     description->setTag(2);
-
-    auto menu = Menu::create(GAME, description, NULL);
+    setting ->setTag(3);
+    auto menu = Menu::create(GAME, description,setting, NULL);
     menu->setPosition(visibleSize.width/2+origin.x,visibleSize.height/2);
     menu->setColor(Color3B::BLACK);
     addChild(menu);
@@ -62,6 +63,7 @@ void Mainmenu::menuClickCallBack(Ref* sender)
     {
         auto scene = Gamemodel::createScene();
         auto Dscene = DESCRIPTION::createScene();
+        auto Sscene = setting::createScene();
         switch (tag)
         {
         case 1:
@@ -70,6 +72,9 @@ void Mainmenu::menuClickCallBack(Ref* sender)
             break;
         case 2:
             Director::getInstance()->replaceScene(Dscene);
+            break;
+        case 3:
+            Director::getInstance()->replaceScene(Sscene);
             break;
         default:
             break;

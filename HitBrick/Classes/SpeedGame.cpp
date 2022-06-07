@@ -3,9 +3,15 @@
 #include "store.h"
 #include "Gamemenu2.h"
 #include "AudioEngine.h"
+#include "setting.h"
 //#include "Gamemenu.cpp"
 
 USING_NS_CC;
+//构造函数 初始化
+HitBrick2::HitBrick2() :speed(6), Gamechoice(0), score(0), ifstart(0), startF(0), bricksnum(0), perscore(1), ballspeedup(250),Gametime(0)
+{
+
+}
 
 Scene* HitBrick2::createScene() {
 
@@ -56,6 +62,8 @@ bool HitBrick2::init()
     addcrazybricks();
     //添加固定砖块
     addstaticbricks();
+    //添加复活砖块
+    addrevivebricks();
     //添加暂停按钮
     addbutton();
     //添加分数
@@ -95,6 +103,7 @@ void HitBrick2::addBackGround()
 void HitBrick2::addBoard()
 {
     board = Sprite::create("board/board.png");
+    board->setColor(BD.colorname());
     board->setAnchorPoint(Vec2(0.5f, 0.5f));
     board->setPosition(Vec2(visibleSize.width / 2 + origin.x, origin.y + 50));
 
@@ -125,6 +134,7 @@ void HitBrick2::addBoard()
 void HitBrick2::addball()
 {
     ball = Sprite::create("ball/ball.png");
+    ball->setColor(BL.colorname());
     ball->setScale(2.0f, 2.0f);
     ball->setPosition(Vec2(visibleSize.width / 2 + origin.x, origin.y + 48 + board->getContentSize().height));
 
@@ -338,8 +348,24 @@ void HitBrick2::update(float delta) {
     Node* ball = this->getChildByTag(tagball);
     if (ball->getPositionY() <= 0)
     {
-        unscheduleUpdate();
-        Gameover();
+       
+        if (revivetimes == 0) {
+            unscheduleUpdate();
+            Gameover();
+        }
+        else {
+            revivetimes--;
+            ifstart = 0;
+            score -= 5;
+            removeChild(board);
+            removeChild(ball);
+            addBoard();
+            addball();
+            setJoint();
+            strscore = StringUtils::format("%d", score);
+            scorelabel->setString(strscore);
+            removeChild(revivepng);
+        }
     }
 
     Node* board = this->getChildByTag(tagboard);
@@ -349,7 +375,6 @@ void HitBrick2::update(float delta) {
     auto s = EventKeyboard::KeyCode::KEY_S;
     auto a = EventKeyboard::KeyCode::KEY_A;
     auto d = EventKeyboard::KeyCode::KEY_D;
-    auto p = EventKeyboard::KeyCode::KEY_P;
     float offsetx = 0;
     float offsety = 0;
 
@@ -402,17 +427,7 @@ void HitBrick2::update(float delta) {
     {
         offsety = -1 * speed;
     }
-    if (keyMap[p]) {
-        ifstart = 0;
-        score -= 1;
-        removeChild(board);
-        removeChild(ball);
-        addBoard();
-        addball();
-        setJoint();
-        strscore = StringUtils::format("%d", score);
-        scorelabel->setString(strscore);
-    }
+   
 
     if (offsetx == 0 && offsety == 0 && !keyMap[EventKeyboard::KeyCode::KEY_SPACE])
         return;
@@ -627,6 +642,40 @@ void HitBrick2::addstaticbricks() {
     }
 }
 
+void HitBrick2::addrevivebricks() {
+    TMXObjectGroup* objectGroup = map->getObjectGroup("revivebrick");
+    ValueVector values = objectGroup->getObjects();
+
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("revivebrick.png");
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+        addChild(it);
+        it->setTag(tagrevivebrick);
+    }
+}
+
 void HitBrick2::onKeyPressed(EventKeyboard::KeyCode keycode, Event* event)
 {
     //键盘按下
@@ -650,6 +699,17 @@ void HitBrick2::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
             ball->getPhysicsBody()->setVelocity(Vec2(0, startF * 4));
             AudioEngine::play2d("biu.mp3", false, 1.0);
         }
+    }
+    else if (EventKeyboard::KeyCode::KEY_P == keycode) {
+        ifstart = 0;
+        score -= 5;
+        removeChild(board);
+        removeChild(ball);
+        addBoard();
+        addball();
+        setJoint();
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
     }
     return;
 }
@@ -776,6 +836,37 @@ bool HitBrick2::onConcactBegin(PhysicsContact& contact) {
         strscore = StringUtils::format("%d", score);
 
         scorelabel->setString(strscore);
+    }
+
+    //revivebrick
+    else if (nodeA->getTag() == tagrevivebrick && nodeB->getTag() == tagball) {
+    removeChild(nodeA);
+    bricksnum--;
+    score += perscore;
+    ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+
+    revivetimes++;
+    revivepng = Sprite::create("revive.png");
+    revivepng->setPosition(Vec2(visibleSize.width + origin.x - 20, origin.y + 48));
+    addChild(revivepng);
+    //更新score
+    strscore = StringUtils::format("%d", score);
+    scorelabel->setString(strscore);
+    }
+    else if (nodeB->getTag() == tagrevivebrick && nodeA->getTag() == tagball) {
+    removeChild(nodeB);
+    bricksnum--;
+    score += perscore;
+    ball->getPhysicsBody()->applyImpulse(ballspeedup * dir);   //加速
+
+    revivetimes++;
+    revivepng = Sprite::create("revive.png");
+    revivepng->setPosition(Vec2(visibleSize.width + origin.x - 20, origin.y + 48));
+    addChild(revivepng);
+    //更新score
+    strscore = StringUtils::format("%d", score);
+
+    scorelabel->setString(strscore);
     }
     if (bricksnum == 0)
     {
@@ -969,7 +1060,7 @@ void HitBrick2::settlement()
 
 void HitBrick2::backGamemenu(float dt) {
     AudioEngine::stopAll();
-    AudioEngine::play2d("Gamemusic.mp3", true, 1.0);
+    AudioEngine::play2d("menumusic.mp3", true, 1.0);
     auto Gamescene = Gamemenu2::createScene();
     Director::getInstance()->replaceScene(Gamescene);
 }

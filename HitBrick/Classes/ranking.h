@@ -13,15 +13,15 @@ public:
 	static cocos2d::Scene* createScene();
 
 	virtual bool init();
-
+	ranking();
 	void menuClickCallBack(Ref* sender);
 	void bg();
 	void getscore();
 	void gettime();
 	void update(float delta);
 	void addBackGround();
-	int gamechoice = 0;
-	int model = 0;
+	int gamechoice;
+	int model;
 	Size visibleSize;
 	Vec2 origin;
 

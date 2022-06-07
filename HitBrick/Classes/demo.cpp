@@ -5,6 +5,11 @@
 #include "AudioEngine.h"
 
 USING_NS_CC;
+//构造函数 初始化
+HitBrick::HitBrick() :speed(6), Gamechoice(0), score(0), ifstart(0), startF(0), bricksnum(0), perscore(1), ballspeedup(250)
+{
+
+}
 
 Scene* HitBrick::createScene() {
 
@@ -99,6 +104,7 @@ void HitBrick::addBackGround()
 void HitBrick::addBoard()
 {
     board = Sprite::create("board/board.png");
+    board->setColor(BD.colorname());
     board->setAnchorPoint(Vec2(0.5f, 0.5f));
     board->setPosition(Vec2(visibleSize.width/2 + origin.x, origin.y + 50));
 
@@ -129,6 +135,7 @@ void HitBrick::addBoard()
 void HitBrick::addball()
 {
     ball = Sprite::create("ball/ball.png");
+    ball->setColor(BL.colorname());
     ball->setScale(2.0f,2.0f);
     ball->setPosition(Vec2(visibleSize.width/2 + origin.x, origin.y + 50 + board->getContentSize().height));
 
@@ -339,7 +346,6 @@ void HitBrick::update(float delta) {
     auto s = EventKeyboard::KeyCode::KEY_S;
     auto a = EventKeyboard::KeyCode::KEY_A;
     auto d = EventKeyboard::KeyCode::KEY_D;
-    auto p = EventKeyboard::KeyCode::KEY_P;
     int offsetx = 0;
     int offsety = 0;
 
@@ -391,17 +397,6 @@ void HitBrick::update(float delta) {
     if (keyMap[s] && ifs)
     {
         offsety = -1 * speed;
-    }
-    if (keyMap[p]) {
-        ifstart = 0;
-        score -= 1;
-        removeChild(board);
-        removeChild(ball);
-        addBoard();
-        addball();
-        setJoint();
-        strscore = StringUtils::format("%d", score);
-        scorelabel->setString(strscore);
     }
 
     if (offsetx == 0 && offsety == 0 && !keyMap[EventKeyboard::KeyCode::KEY_SPACE])
@@ -466,7 +461,45 @@ void HitBrick::addBricks()
         Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
     }
 }
+void HitBrick::addrevivebricks()
+{
+    TMXObjectGroup* objectGroup = map->getObjectGroup("revivebricks");
+    ValueVector values = objectGroup->getObjects();
 
+    for (Value value : values)//遍历所有对象
+    {
+        ValueMap valueMap = value.asValueMap();//获得属性值：Value转换成ValueMap
+        float x = valueMap["x"].asFloat();//获取对象的属性:(as一类的方法 （转换类型）
+        float y = valueMap["y"].asFloat();
+        //name/type/width/height
+       //int hp = valueMap["hp"].asInt();
+        int type = valueMap["type"].asInt();
+        //添加砖块精灵
+        Sprite* it = Sprite::create("bluebrick.png"); //enemy = type == 4 ? Sprite::create("CloseNormal.png") : Sprite::create("CloseSelected.png");//根据位置属性创建精灵
+        it->setAnchorPoint(Vec2(0, 0));
+        it->setPosition(60 + x, y);
+
+
+        auto BrickBody = PhysicsBody::createCircle(it->getContentSize().height / 2, PhysicsMaterial(0.1f, 1.0f, 0.0f));
+
+        BrickBody->setCategoryBitmask(0xFFFFFFFF);             //类别掩码
+        BrickBody->setCollisionBitmask(0xFFFFFFFF);            //允许撞我
+        BrickBody->setContactTestBitmask(0xFFFFFFFF);         //可接到通知
+        BrickBody->setGravityEnable(false);                    //不受重力影响
+
+        //BrickBody->setTag(tagbrick);
+
+        BrickBody->setRotationEnable(false);                  //设定不旋转
+        BrickBody->setDynamic(false);
+        it->setPhysicsBody(BrickBody);
+
+        this->addChild(it);
+        it->setTag(tagbrick);
+
+        bricksnum++;
+        Brickpath.push_back(Vec2(x, y));//将路径点保存到路径中
+    }
+}
 void HitBrick::add2xbricks() {
     TMXObjectGroup* objectGroup = map->getObjectGroup("2xbrick");
     ValueVector values = objectGroup->getObjects();
@@ -619,6 +652,7 @@ void HitBrick::onKeyPressed(EventKeyboard::KeyCode keycode, Event* event)
     if (EventKeyboard::KeyCode::KEY_SPACE == keycode && ifstart==0) {                      
         ifstart = 1;    //在update函数中蓄力
     }
+
 }
 
 void HitBrick::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
@@ -636,7 +670,20 @@ void HitBrick::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
             removeChild(kuang);
         }
     }
-  
+    else if (EventKeyboard::KeyCode::KEY_P == keycode) {
+        ifstart = 0;
+        score -= 5;
+        removeChild(board);
+        removeChild(ball);
+        addBoard();
+        addball();
+        setJoint();
+        strscore = StringUtils::format("%d", score);
+        scorelabel->setString(strscore);
+
+        startF=0;                   //赋予小球的动量
+        addkuang();
+    }
     return;
 }
 

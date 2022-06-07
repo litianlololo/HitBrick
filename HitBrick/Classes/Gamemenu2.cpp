@@ -7,7 +7,11 @@
 #include "ranking.h"
 
 USING_NS_CC;
+//构造函数 初始化
+Gamemenu2::Gamemenu2() :Gamechoice(0), visibleSize(Size(0, 0)), origin(Vec2(0, 0))
+{
 
+}
 
 Scene* Gamemenu2::createScene()
 {

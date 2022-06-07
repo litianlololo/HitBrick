@@ -8,6 +8,12 @@
 extern SOCKET client;
 extern std::string IPAddr;
 USING_NS_CC;
+
+onlineGame::onlineGame() :speed(6), Gamechoice(0), score(0), ifstart(0), startF(180), bricksnum(0), perscore(1), ballspeedup(250), Gametime(0)
+{
+
+}
+
 void changemap(std::map<int, int>& mymap, int key, int value);
 Scene* onlineGame::createScene() {
 
@@ -703,26 +709,26 @@ void onlineGame::BrickT()
         val = 0;
     }
     dataSend = "*";
+    //记录打碎砖块的Tag
     for (std::pair<int, int> val : BrickPath)
     {
 
-        if (val.second == 0) {  
+        if (val.second == 0) {
             dataSend += DataCMP(val.first);
-            val.second = 1;
         }
     }
-    /*
+    dataSend += "!";
+    send(client, dataSend.c_str(), dataSend.size(), 0);
+
+    //打碎的砖块Value重置
     std::map<int, int>::iterator iter;
     for (iter = BrickPath.begin(); iter != BrickPath.end(); iter++)
     {
         if (iter->second == 0) {
-            dataSend += BrickCMP(iter->first);
-           
-            //BrickPath.erase(iter);
+            iter->second == 1;
         }
-    }*/
-    dataSend += "!";
-    send(client, dataSend.c_str(), dataSend.size(), 0);
+    }
+
 }
 //信息转换成string
 std::string onlineGame::DataCMP(int value)

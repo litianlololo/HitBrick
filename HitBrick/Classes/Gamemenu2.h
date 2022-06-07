@@ -14,13 +14,13 @@ public:
 	static cocos2d::Scene* createScene();
 
 	virtual bool init();
-
+	Gamemenu2();
 	void menuClickCallBack(Ref* sender);
 	//void menuGoToHelloworld(Ref* pSender);
 	void addBackGround();
 	void update(float delta);
 	void Game();
-	int Gamechoice = 0;
+	int Gamechoice;
 	Size visibleSize;
 	Vec2 origin;
 

@@ -8,7 +8,11 @@
 #include "ranking.h"
 
 USING_NS_CC;
+//构造函数 初始化
+ranking::ranking():model(0),gamechoice(0)
+{
 
+}
 
 Scene* ranking::createScene()
 {
